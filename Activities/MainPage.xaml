@@ -1,0 +1,110 @@
+﻿<Page
+    x:Class="ActivitiesExample.MainPage"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:local="using:ActivitiesExample"
+    xmlns:converters="using:ActivitiesExample.Converters"
+    xmlns:data="using:ActivitiesExample.Data"
+    d:DataContext="{Binding Source={d:DesignInstance Type=data:MyDesignData, IsDesignTimeCreatable=True}}"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    mc:Ignorable="d"
+    Background="#FF1bA1E2">
+	
+    <Page.Resources>
+        <converters:ElipsisVisible x:Key="VisibleElipsis"/>
+        <converters:TimeSpanToString x:Key="TimeToString"/>
+        <converters:TimeSpanToWidth x:Key="TimeToWidth"/>
+        <converters:ActivityToImage x:Key="ActivityToIcon"/>
+        <converters:ActivityToActivityHint x:Key="ActivityToHint"/>
+    </Page.Resources>
+    
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+        </Grid.RowDefinitions>
+        
+        <!--TitlePanel contains the name of the application and page title-->
+        <StackPanel x:Name="TitlePanel" Grid.Row="0"  Margin="24,24,24,0" >
+            <TextBlock x:Uid="ApplicationSuite" Text="_SensorCore Example" Style="{ThemeResource TitleTextBlockStyle}" Typography.Capitals="SmallCaps" Foreground="White"/>
+            <TextBlock x:Uid="ApplicationName"  Text="_activities" Style="{ThemeResource HeaderTextBlockStyle}" Foreground="White"/>
+        </StackPanel>
+
+        <!--ContentPanel - place additional content here-->
+        <Grid Grid.Row="1" Margin="0">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="*"/>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
+            </Grid.RowDefinitions>
+           
+            <!-- current activity text -->
+            <StackPanel Grid.Row="0" Margin="24,0,0,0" VerticalAlignment="Center" HorizontalAlignment="Left">
+                <TextBlock x:Uid="CurrentActivityHeader" Text="_Current activity:"  FontSize="{StaticResource TextStyleMediumFontSize}" VerticalAlignment="Center"/>
+                <TextBlock Text="{Binding Path=CurrentActivity, Mode=OneWay}" HorizontalAlignment="Left" FontSize="{StaticResource TextStyleExtraLargePlusFontSize}" Margin="12,0,0,0" VerticalAlignment="Center" />
+            </StackPanel>
+
+            <!-- current activity icon -->
+            <Image Source="{Binding CurrentActivity, Converter={StaticResource ActivityToIcon}}" Grid.Row="2" Opacity=".1" Height="300" Width="300"/>
+
+            <!-- List of activities -->
+            <TextBlock x:Uid="ActivitiesListHeader" Text="_Today's activities" Grid.Row="1" Margin="24,0,0,6" FontSize="{StaticResource TextStyleMediumFontSize}"/>
+            <ListView x:Name="ActivityListView" Grid.Row="2" Margin="24,0" ItemsSource="{Binding Path=ListData, Mode=OneWay}" Background="#3FFFFFFF" SelectionMode="None" Height="310">
+                <ListView.ItemTemplate>
+                    <DataTemplate>
+                        <Grid Margin="0" Height="60">
+                            <Grid.RowDefinitions >
+                                <RowDefinition Height="*"/>
+                                <RowDefinition Height="auto"/>
+                                <RowDefinition Height="auto"/>
+                                <RowDefinition Height="*"/>
+                            </Grid.RowDefinitions>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="30"/>
+                            </Grid.ColumnDefinitions>
+                            <StackPanel Grid.Row="01" Grid.ColumnSpan="2" Orientation="Horizontal" Margin="12,0,0,0" >
+                                <TextBlock Text="{Binding Path=ActivityName}" FontSize="{StaticResource TextStyleMediumFontSize}" Foreground="White" VerticalAlignment="Center"/>
+                                <TextBlock Text="{Binding Path=ActivityTime, Converter={StaticResource ResourceKey=TimeToString}}" FontSize="{StaticResource TextStyleMediumFontSize}" Foreground="White" Margin="12,0,0,0" VerticalAlignment="Center"/>
+                            </StackPanel>
+                            <TextBlock Grid.Row="2" Text="{Binding Path=ActivityName, Converter={StaticResource ResourceKey=ActivityToHint}}" FontSize="{StaticResource TextStyleSmallFontSize}" Foreground="White" VerticalAlignment="Center" Margin="12,0,0,6"/>
+                            <Rectangle Margin="0" Grid.Row="3" Grid.Column="0" Width="{Binding Path=ActivityTime, Converter={StaticResource ResourceKey=TimeToWidth}}" Height="6" Fill="White" VerticalAlignment="Top" HorizontalAlignment="Left"/>
+                            <StackPanel Grid.Row="3" Grid.Column="1" Orientation="Horizontal" Visibility="{Binding ActivityTime, Converter={StaticResource VisibleElipsis}}">
+                                <Rectangle Margin="6,0,0,0" Width="6" Height="6" Fill="White" HorizontalAlignment="Left" VerticalAlignment="Top"/>
+                                <Rectangle Margin="6,0,0,0" Width="6" Height="6" Fill="White" HorizontalAlignment="Right" VerticalAlignment="Top"/>
+                            </StackPanel>
+                        </Grid>
+                    </DataTemplate>
+                </ListView.ItemTemplate>
+            </ListView>
+            
+            <!-- x coordinates -->
+            <Grid Grid.Row="4" Margin="24,0,24,24" Height="24">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="2*"/>
+                    <ColumnDefinition Width="3*"/>
+                    <ColumnDefinition Width="3*"/>
+                    <ColumnDefinition Width="3*"/>
+                    <ColumnDefinition Width="2*"/>
+                </Grid.ColumnDefinitions>
+                <TextBlock Text="00h" Grid.Column="0" HorizontalAlignment="Left" FontSize="{StaticResource TextStyleMediumFontSize}"/>
+                <TextBlock Text="03h" Grid.Column="1" HorizontalAlignment="Center" FontSize="{StaticResource TextStyleMediumFontSize}"/>
+                <TextBlock Text="06h" Grid.Column="2" HorizontalAlignment="Center"  FontSize="{StaticResource TextStyleMediumFontSize}"/>
+                <TextBlock Text="09h" Grid.Column="3" HorizontalAlignment="Center"  FontSize="{StaticResource TextStyleMediumFontSize}"/>
+                <TextBlock Text="12h" Grid.Column="4" HorizontalAlignment="Right" FontSize="{StaticResource TextStyleMediumFontSize}"/>
+            </Grid>
+        </Grid>
+    </Grid>
+
+    <Page.BottomAppBar>
+        <CommandBar ClosedDisplayMode="Minimal" Opacity="0.5">
+            <CommandBar.SecondaryCommands>
+                <AppBarButton x:Uid="Refresh" Label="_refresh _todays' _activities" Click="RefreshButton_Click"/>
+                <AppBarButton x:Uid="About" Label="_about" Click="AboutButton_Click"/>
+            </CommandBar.SecondaryCommands>
+        </CommandBar>
+    </Page.BottomAppBar>
+    
+</Page>

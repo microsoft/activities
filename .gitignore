@@ -172,3 +172,10 @@ UpgradeLog*.htm
 
 # Microsoft Fakes
 FakesAssemblies/
+
+#LumiaSDKFiles
+Help/
+
+#WindowsStore build artefacts
+BundleArtifacts
+.nuget/NuGet.exe

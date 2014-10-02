@@ -186,8 +186,23 @@ The application will now exit.</value>
   <data name="Hint.Walking" xml:space="preserve">
     <value>The user was walking with the phone.</value>
   </data>
+  <data name="NextButton.Label" xml:space="preserve">
+    <value>next day</value>
+  </data>
+  <data name="PrevButton.Label" xml:space="preserve">
+    <value>previous day</value>
+  </data>
   <data name="Refresh.Label" xml:space="preserve">
     <value>refresh todays' activities</value>
+  </data>
+  <data name="RefreshButton.Label" xml:space="preserve">
+    <value>update history</value>
+  </data>
+  <data name="TimeWindow.Today" xml:space="preserve">
+    <value>Today</value>
+  </data>
+  <data name="TimeWindow.Yesterday" xml:space="preserve">
+    <value>Yesterday</value>
   </data>
   <data name="Version.Text" xml:space="preserve">
     <value>Version: </value>

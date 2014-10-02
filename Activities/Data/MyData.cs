@@ -21,6 +21,9 @@ namespace ActivitiesExample.Data
         private IList<ActivityMonitorReading> _history;
         private Activity _activity = Activity.Idle;
 
+        // time window index, 0 = today, -1 = yesterday 
+        private double timeWindowIndex = 0;
+
         public event PropertyChangedEventHandler PropertyChanged;
 
         private void NotifyPropertyChanged([CallerMemberName] String propertyName = "")
@@ -57,6 +60,32 @@ namespace ActivitiesExample.Data
             {
                 _activity = value;
                 NotifyPropertyChanged("CurrentActivity");
+            }
+        }
+
+        public double TimeWindow
+        {
+            get
+            {
+                return timeWindowIndex;
+            }
+        }
+
+        public void NextDay()
+        {
+            if (timeWindowIndex < 0)
+            {
+                timeWindowIndex++;
+                NotifyPropertyChanged("TimeWindow");
+            }
+        }
+
+        public void PreviousDay()
+        {
+            if (timeWindowIndex >= -9)
+            {
+                timeWindowIndex--;
+                NotifyPropertyChanged("TimeWindow");
             }
         }
 

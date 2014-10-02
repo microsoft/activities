@@ -17,6 +17,9 @@ namespace ActivitiesExample.Data
         private List<MyQuantifiedData> _ListData = null;
         private static MyDesignData _self;
 
+        // time window index, 0 = today, -1 = yesterday 
+        private double timeWindowIndex = 0;
+
         public event PropertyChangedEventHandler PropertyChanged;
 
         private void NotifyPropertyChanged([CallerMemberName] String propertyName = "")
@@ -63,6 +66,15 @@ namespace ActivitiesExample.Data
                 return _ListData;
             }
         }
+
+        public double TimeWindow
+        {
+            get
+            {
+                return timeWindowIndex;
+            }
+        }
+
     }
 
 }

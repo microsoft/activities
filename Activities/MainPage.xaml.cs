@@ -39,6 +39,7 @@ namespace ActivitiesExample
         private IActivityMonitor _activityMonitor = null;
         private bool _runningInEmulator = false;
         private readonly ResourceLoader resourceLoader = ResourceLoader.GetForCurrentView("Resources");
+
         #endregion
 
         /// <summary>
@@ -245,8 +246,8 @@ namespace ActivitiesExample
             {
                 if (!await CallSensorCoreApiAsync(async () =>
                 {
-                    // read all the activities recorded today by the Lumia SensorCore
-                    MyData.Instance().History = await _activityMonitor.GetActivityHistoryAsync(DateTime.Now.Date, DateTime.Now - DateTime.Now.Date);
+                        // get the data for the current 24h time window
+                        MyData.Instance().History = await _activityMonitor.GetActivityHistoryAsync(DateTime.Now.Date.AddDays(MyData.Instance().TimeWindow), new TimeSpan(24,0,0 ));
                 }))
                 {
                     Debug.WriteLine("Reading the history failed.");
@@ -263,6 +264,27 @@ namespace ActivitiesExample
         {
             PollHistory();
         }
+
+        private void prevButton_Click(object sender, RoutedEventArgs e)
+        {
+            // move the time window 24 to the past
+            MyData.Instance().PreviousDay();
+            nextButton.IsEnabled = true;
+            prevButton.IsEnabled = MyData.Instance().TimeWindow > -10;
+            refreshButton.IsEnabled = false;
+            PollHistory();
+        }
+
+        private void nextButton_Click(object sender, RoutedEventArgs e)
+        {
+            // move the time window 24h to the present
+            MyData.Instance().NextDay();
+            nextButton.IsEnabled = MyData.Instance().TimeWindow < 0;
+            prevButton.IsEnabled = true;
+            refreshButton.IsEnabled = MyData.Instance().TimeWindow == 0;
+            PollHistory();
+        }
+
     }
 }
 

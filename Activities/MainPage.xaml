@@ -48,32 +48,36 @@
             </StackPanel>
 
             <!-- current activity icon -->
-            <Image Source="{Binding CurrentActivity, Converter={StaticResource ActivityToIcon}}" Grid.Row="2" Opacity=".1" Height="300" Width="300"/>
+            <Image Source="{Binding CurrentActivity, Converter={StaticResource ActivityToIcon}}" Grid.Row="2" Height="300" Width="300" Opacity="0.3"/>
 
             <!-- List of activities -->
             <TextBlock Text="{Binding Path=TimeWindow, Converter={StaticResource ResourceKey=TimeWindowToString}, Mode=OneWay}" Grid.Row="1" Margin="24,0,0,6" FontSize="{StaticResource TextStyleMediumFontSize}"/>
             <ListView x:Name="ActivityListView" Grid.Row="2" Margin="24,0" ItemsSource="{Binding Path=ListData, Mode=OneWay}" Background="#3FFFFFFF" SelectionMode="None" Height="310">
                 <ListView.ItemTemplate>
                     <DataTemplate>
-                        <Grid Margin="0" Height="60">
+                        <Grid Margin="0" Height="60" Width="{Binding ActualWidth, ElementName=ActivityListView, Mode=OneWay}">
                             <Grid.RowDefinitions >
-                                <RowDefinition Height="auto"/>
+                                <RowDefinition Height="10"/>
                                 <RowDefinition Height="auto"/>
                                 <RowDefinition Height="auto"/>
                                 <RowDefinition Height="*"/>
                             </Grid.RowDefinitions>
                             <Grid.ColumnDefinitions>
-                                <ColumnDefinition Width="95*"/>
-                                <ColumnDefinition Width="227*"/>
+                                <ColumnDefinition Width="*"/>
+                                <!-- 30px reserved for elipsis -->
                                 <ColumnDefinition Width="30"/>
                             </Grid.ColumnDefinitions>
-                            <StackPanel Grid.ColumnSpan="3" Orientation="Horizontal" Margin="12,8,-0.333,0" Grid.RowSpan="2" >
+                            <!-- Activity name and durations -->
+                            <StackPanel Orientation="Horizontal"  Grid.Row="1" Margin="12,0,0,0" >
                                 <TextBlock Text="{Binding Path=ActivityName}" FontSize="{StaticResource TextStyleMediumFontSize}" Foreground="White" VerticalAlignment="Center"/>
                                 <TextBlock Text="{Binding Path=ActivityTime, Converter={StaticResource ResourceKey=TimeToString}}" FontSize="{StaticResource TextStyleMediumFontSize}" Foreground="White" Margin="12,0,0,0" VerticalAlignment="Center"/>
                             </StackPanel>
-                            <TextBlock Grid.Row="2" Text="{Binding Path=ActivityName, Converter={StaticResource ResourceKey=ActivityToHint}}" FontSize="{StaticResource TextStyleSmallFontSize}" Foreground="White" VerticalAlignment="Center" Margin="12,0,29.667,5.833" Grid.ColumnSpan="3"/>
-                            <Rectangle Margin="0,0.167,-29.333,0" Grid.Row="3" Grid.Column="0" Width="{Binding Path=ActivityTime, Converter={StaticResource ResourceKey=TimeToWidth}}" Height="6" Fill="White" VerticalAlignment="Top" HorizontalAlignment="Left" Grid.ColumnSpan="3"/>
-                            <StackPanel Grid.Row="3" Grid.Column="2" Orientation="Horizontal" Visibility="{Binding ActivityTime, Converter={StaticResource VisibleElipsis}}" Margin="0.333,0.167,-0.333,0">
+                            <!-- Activity description -->
+                            <TextBlock Grid.Row="2" Text="{Binding Path=ActivityName, Converter={StaticResource ResourceKey=ActivityToHint}}" FontSize="{StaticResource TextStyleSmallFontSize}" Foreground="White" VerticalAlignment="Center" Margin="12,1,12.667,5.833" Height="14"/>
+                            <!-- Activity duration as a rectangle -->
+                            <Rectangle Grid.Row="3" Grid.Column="0" Width="{Binding Path=ActivityTime, Converter={StaticResource ResourceKey=TimeToWidth}}" Height="6" Fill="White" VerticalAlignment="Top" HorizontalAlignment="Left"/>
+                            <!-- Elipsis added to the end of rectangle if duration > 12h -->
+                            <StackPanel Grid.Row="3" Grid.Column="1" Orientation="Horizontal" Visibility="{Binding ActivityTime, Converter={StaticResource VisibleElipsis}}">
                                 <Rectangle Margin="6,0,0,0" Width="6" Height="6" Fill="White" HorizontalAlignment="Left" VerticalAlignment="Top"/>
                                 <Rectangle Margin="6,0,0,0" Width="6" Height="6" Fill="White" HorizontalAlignment="Right" VerticalAlignment="Top"/>
                             </StackPanel>

@@ -149,7 +149,7 @@
     <value>activities</value>
   </data>
   <data name="ApplicationSuite.Text" xml:space="preserve">
-    <value>SENSORCORE SAMPLE</value>
+    <value>LUMIA SENSORCORE SAMPLE</value>
   </data>
   <data name="CurrentActivityHeader.Text" xml:space="preserve">
     <value>Current activity:</value>
@@ -172,16 +172,16 @@ The application will now exit.</value>
     <value>Lumia SensorCore</value>
   </data>
   <data name="Hint.Idle" xml:space="preserve">
-    <value>The phone was laying still.</value>
+    <value>The phone was laying still, for example, on a table.</value>
   </data>
   <data name="Hint.Moving" xml:space="preserve">
-    <value>Some movement was detected, other than walkign or running.</value>
+    <value>Some movement was detected, other than walking or running.</value>
   </data>
   <data name="Hint.Running" xml:space="preserve">
     <value>The user was running with the phone.</value>
   </data>
   <data name="Hint.Stationary" xml:space="preserve">
-    <value>The phone was handled but the user was not moving.</value>
+    <value>The phone was handled but the user was not moving around.</value>
   </data>
   <data name="Hint.Walking" xml:space="preserve">
     <value>The user was walking with the phone.</value>
@@ -196,7 +196,7 @@ The application will now exit.</value>
     <value>refresh todays' activities</value>
   </data>
   <data name="RefreshButton.Label" xml:space="preserve">
-    <value>update history</value>
+    <value>update diagram</value>
   </data>
   <data name="TimeWindow.Today" xml:space="preserve">
     <value>Today</value>

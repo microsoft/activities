@@ -12,7 +12,10 @@ namespace ActivitiesExample.Converters
     {
         public object Convert(object value, Type targetType, object parameter, string language)
         {
-            return (352 * ((TimeSpan)value).TotalMinutes) / (12*60);
+            // 320 is an ugly hardcoded value for list width (350) - elipsis column (30)
+            // would be nice if could be suplied as 'parameter' via a binding to list's ActualWidth
+            // but ConverterParameter is non-bindable :(
+            return (320 * ((TimeSpan)value).TotalMinutes) / (12*60);
         }
 
         public object ConvertBack(object value, Type targetType, object parameter, string language)

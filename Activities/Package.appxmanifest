@@ -1,6 +1,6 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Package xmlns="http://schemas.microsoft.com/appx/2010/manifest" xmlns:m2="http://schemas.microsoft.com/appx/2013/manifest" xmlns:m3="http://schemas.microsoft.com/appx/2014/manifest" xmlns:mp="http://schemas.microsoft.com/appx/2014/phone/manifest">
-  <Identity Name="74dcbd9a-3772-41a5-b7d4-f1e511e6b0cd" Publisher="CN=sujesh" Version="1.0.0.1" />
+  <Identity Name="74dcbd9a-3772-41a5-b7d4-f1e511e6b0cd" Publisher="CN=sujesh" Version="1.0.0.5" />
   <Properties>
     <DisplayName>Activities</DisplayName>
     <PublisherDisplayName>Nokia Developer</PublisherDisplayName>

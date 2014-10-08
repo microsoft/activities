@@ -1,6 +1,6 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Package xmlns="http://schemas.microsoft.com/appx/2010/manifest" xmlns:m2="http://schemas.microsoft.com/appx/2013/manifest" xmlns:m3="http://schemas.microsoft.com/appx/2014/manifest" xmlns:mp="http://schemas.microsoft.com/appx/2014/phone/manifest">
-  <Identity Name="74dcbd9a-3772-41a5-b7d4-f1e511e6b0cd" Publisher="CN=sujesh" Version="1.0.0.5" />
+  <Identity Name="74dcbd9a-3772-41a5-b7d4-f1e511e6b0cd" Publisher="CN=sujesh" Version="1.1.0.8" />
   <Properties>
     <DisplayName>Activities</DisplayName>
     <PublisherDisplayName>Nokia Developer</PublisherDisplayName>
@@ -16,7 +16,7 @@
   </Resources>
   <Applications>
     <Application Id="x74dcbd9ay3772y41a5yb7d4yf1e511e6b0cdx" Executable="$targetnametoken$.exe" EntryPoint="ActivitiesExample.App">
-      <m3:VisualElements DisplayName="Activities" Square150x150Logo="Assets\Square150x150Logo.png" Square44x44Logo="Assets\Square44x44Logo.png" Description="Activities - example app for SensorCore's Activity Monitor API" ForegroundText="light" BackgroundColor="transparent" ToastCapable="false">
+      <m3:VisualElements DisplayName="Activities – Lumia SensorCore SDK sample" Square150x150Logo="Assets\Square150x150Logo.png" Square44x44Logo="Assets\Square44x44Logo.png" Description="Activities - example app for SensorCore's Activity Monitor API" ForegroundText="light" BackgroundColor="transparent" ToastCapable="false">
         <m3:DefaultTile Square71x71Logo="Assets\Square71x71Logo.png" Wide310x150Logo="Assets\Wide310x150Logo.png">
         </m3:DefaultTile>
         <m3:ApplicationView MinWidth="width320" />

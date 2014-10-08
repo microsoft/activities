@@ -30,24 +30,24 @@
         <StackPanel x:Name="ContentPanel" Grid.Row="1" Margin="24,24,24,0">
             <RichTextBlock FontSize="16">
                 <Paragraph>
-                    <Run x:Uid="Version" Text="" Foreground="White"/>
-                    <Run x:Name="VersionNumber" Text="" Foreground="White"/>
+                    <Run x:Uid="VersionText" Text="_version: " Foreground="White"/>
+                    <Run x:Name="VersionNumber" Text="_number" Foreground="White"/>
                 </Paragraph>
                 <Paragraph/>		
 		        <Paragraph>
-                    <Run x:Uid="AboutDescription" Text="" Foreground="White"/>
+                    <Run x:Uid="AboutDescription" Text="_description" Foreground="White"/>
                 </Paragraph>
                 <Paragraph/>
                 <Paragraph>
-                    <Run x:Uid="AboutDisclaimer" Text="" Foreground="White"/>
+                    <Run x:Uid="AboutDisclaimer" Text="_disclaimer" Foreground="White"/>
                 </Paragraph>
                 <Paragraph/>
                 <Paragraph>
-                    <Run x:Uid="AboutMore" Text="" Foreground="White"/>
+                    <Run x:Uid="AboutMore" Text="_more" Foreground="White"/>
                 </Paragraph>
                 </RichTextBlock>
-            <HyperlinkButton NavigateUri="http://developer.nokia.com"
-                Content="Nokia Developer website" FontSize="24"/>
+            <HyperlinkButton x:Uid="AboutHyperlinkProject" NavigateUri="http://"
+                Content="_project link" FontSize="24"/>
         </StackPanel>
 
     </Grid>

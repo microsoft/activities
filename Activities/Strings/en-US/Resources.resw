@@ -121,26 +121,22 @@
     <value>about</value>
   </data>
   <data name="AboutDescription.Text" xml:space="preserve">
-    <value>This developer sample demonstrates SensorCore SDK's Activity Monitor API functionality.</value>
+    <value>The Activities developer sample application demonstrates Lumia SensorCore SDK's Activity Monitor API functionality.</value>
   </data>
   <data name="AboutDisclaimer.Text" xml:space="preserve">
-    <value>This Nokia developer example application has been created to provide tips and best practice guidance for software developers and app designers, and may not have all the features you would expect in a commercial product. This application is published in Store as a free software as it may also have value to regular Nokia phone users. The source code and documentation of this example can be downloaded from Nokia Developer website.</value>
+    <value>This developer sample application has been created to provide tips and best practice guidance for software developers and app designers, and may not have all the features you would expect in a commercial product. This application is published in Store as a free software as it may also have value to regular Nokia phone users. The source code and more information of this sample can be from GitHub:</value>
   </data>
-  <data name="AboutHyperlinkProject.Text" xml:space="preserve">
-    <value>Nokia Developer website</value>
+  <data name="AboutHyperlinkProject.Content" xml:space="preserve">
+    <value>Activities project in GitHub</value>
+  </data>
+  <data name="AboutHyperlinkProject.NavigateUri" xml:space="preserve">
+    <value>https://github.com/nokia-developer/activities</value>
   </data>
   <data name="AboutMore.Text" xml:space="preserve">
     <value>Learn more and get the latest version of this software from:</value>
   </data>
   <data name="AboutPage.Text" xml:space="preserve">
     <value>about</value>
-  </data>
-  <data name="AboutPage_ProjectRun_Text" xml:space="preserve">
-    <value>{0}</value>
-    <comment>{0} is a link to the Nokia Developer website</comment>
-  </data>
-  <data name="AboutPage_VersionText" xml:space="preserve">
-    <value>Activity Monitor version {0}</value>
   </data>
   <data name="ActivitiesListHeader.Text" xml:space="preserve">
     <value>Today's activities:</value>
@@ -204,8 +200,7 @@ The application will now exit.</value>
   <data name="TimeWindow.Yesterday" xml:space="preserve">
     <value>Yesterday</value>
   </data>
-  <data name="Version.Text" xml:space="preserve">
-    <value>Version: </value>
-    <comment>.</comment>
+  <data name="VersionText.Text" xml:space="preserve">
+    <value>Activities version: </value>
   </data>
 </root>

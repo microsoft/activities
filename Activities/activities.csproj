@@ -19,7 +19,7 @@
     <AppxBundlePlatforms>arm</AppxBundlePlatforms>
     <PackageCertificateThumbprint>5F7524CDD75F3F41BAC31F01C368A249D987521B</PackageCertificateThumbprint>
     <PackageCertificateKeyFile>ActivityMonitorSample_WP_CSharp_TemporaryKey.pfx</PackageCertificateKeyFile>
-    <NuGetPackageImportStamp>8de5a172</NuGetPackageImportStamp>
+    <NuGetPackageImportStamp>55367aa0</NuGetPackageImportStamp>
     <SolutionDir Condition="$(SolutionDir) == '' Or $(SolutionDir) == '*Undefined*'">.\</SolutionDir>
     <RestorePackages>true</RestorePackages>
     <AppxBundle>Never</AppxBundle>
@@ -162,11 +162,11 @@
   <ItemGroup>
     <Reference Include="Lumia.Sense, Version=255.255.255.255, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\packages\LumiaSensorCoreSDK.0.9.1.3\lib\wpa81\x86\Lumia.Sense.winmd</HintPath>
+      <HintPath>..\packages\LumiaSensorCoreSDK.1.0.3.263\lib\portable-wpa81+wp81\x86\Lumia.Sense.winmd</HintPath>
     </Reference>
     <Reference Include="Lumia.Sense.Testing, Version=255.255.255.255, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\packages\LumiaSensorCoreSDKTesting.0.9.1.3\lib\wpa81\x86\Lumia.Sense.Testing.winmd</HintPath>
+      <HintPath>..\packages\LumiaSensorCoreSDKTesting.1.0.3.263\lib\portable-wpa81+wp81\x86\Lumia.Sense.Testing.winmd</HintPath>
     </Reference>
   </ItemGroup>
   <PropertyGroup Condition=" '$(VisualStudioVersion)' == '' or '$(VisualStudioVersion)' &lt; '12.0' ">
@@ -181,12 +181,12 @@
       <ErrorText>This project references NuGet package(s) that are missing on this computer. Enable NuGet Package Restore to download them.  For more information, see http://go.microsoft.com/fwlink/?LinkID=322105. The missing file is {0}.</ErrorText>
     </PropertyGroup>
     <Error Condition="!Exists('$(SolutionDir)\.nuget\NuGet.targets')" Text="$([System.String]::Format('$(ErrorText)', '$(SolutionDir)\.nuget\NuGet.targets'))" />
-    <Error Condition="!Exists('..\packages\LumiaSensorCoreSDK.0.9.1.3\build\wpa81\LumiaSensorCoreSDK.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\LumiaSensorCoreSDK.0.9.1.3\build\wpa81\LumiaSensorCoreSDK.targets'))" />
-    <Error Condition="!Exists('..\packages\LumiaSensorCoreSDKTesting.0.9.1.3\build\wpa81\LumiaSensorCoreSDKTesting.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\LumiaSensorCoreSDKTesting.0.9.1.3\build\wpa81\LumiaSensorCoreSDKTesting.targets'))" />
+    <Error Condition="!Exists('..\packages\LumiaSensorCoreSDK.1.0.3.263\build\wpa81\LumiaSensorCoreSDK.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\LumiaSensorCoreSDK.1.0.3.263\build\wpa81\LumiaSensorCoreSDK.targets'))" />
+    <Error Condition="!Exists('..\packages\LumiaSensorCoreSDKTesting.1.0.3.263\build\wpa81\LumiaSensorCoreSDKTesting.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\LumiaSensorCoreSDKTesting.1.0.3.263\build\wpa81\LumiaSensorCoreSDKTesting.targets'))" />
   </Target>
   <Import Project="$(SolutionDir)\.nuget\NuGet.targets" Condition="Exists('$(SolutionDir)\.nuget\NuGet.targets')" />
-  <Import Project="..\packages\LumiaSensorCoreSDK.0.9.1.3\build\wpa81\LumiaSensorCoreSDK.targets" Condition="Exists('..\packages\LumiaSensorCoreSDK.0.9.1.3\build\wpa81\LumiaSensorCoreSDK.targets')" />
-  <Import Project="..\packages\LumiaSensorCoreSDKTesting.0.9.1.3\build\wpa81\LumiaSensorCoreSDKTesting.targets" Condition="Exists('..\packages\LumiaSensorCoreSDKTesting.0.9.1.3\build\wpa81\LumiaSensorCoreSDKTesting.targets')" />
+  <Import Project="..\packages\LumiaSensorCoreSDK.1.0.3.263\build\wpa81\LumiaSensorCoreSDK.targets" Condition="Exists('..\packages\LumiaSensorCoreSDK.1.0.3.263\build\wpa81\LumiaSensorCoreSDK.targets')" />
+  <Import Project="..\packages\LumiaSensorCoreSDKTesting.1.0.3.263\build\wpa81\LumiaSensorCoreSDKTesting.targets" Condition="Exists('..\packages\LumiaSensorCoreSDKTesting.1.0.3.263\build\wpa81\LumiaSensorCoreSDKTesting.targets')" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.
   <Target Name="BeforeBuild">

@@ -35,14 +35,14 @@
         <!--ContentPanel - place additional content here-->
         <Grid Grid.Row="1" Margin="0">
             <Grid.RowDefinitions>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
                 <RowDefinition Height="*"/>
-                <RowDefinition Height="Auto"/>
-                <RowDefinition Height="Auto"/>
                 <RowDefinition Height="Auto"/>
             </Grid.RowDefinitions>
 
             <!-- current activity text -->
-            <StackPanel Grid.Row="0" Margin="24,0,0,0" VerticalAlignment="Center" HorizontalAlignment="Left">
+            <StackPanel Grid.Row="0" Margin="24,24,0,24" VerticalAlignment="Center" HorizontalAlignment="Left">
                 <TextBlock x:Uid="CurrentActivityHeader" Text="_Current activity:"  FontSize="{StaticResource TextStyleMediumFontSize}" VerticalAlignment="Center"/>
                 <TextBlock Text="{Binding Path=CurrentActivity, Mode=OneWay}" HorizontalAlignment="Left" FontSize="{StaticResource TextStyleExtraLargePlusFontSize}" Margin="12,0,0,0" VerticalAlignment="Center" />
             </StackPanel>
@@ -52,7 +52,7 @@
 
             <!-- List of activities -->
             <TextBlock Text="{Binding Path=TimeWindow, Converter={StaticResource ResourceKey=TimeWindowToString}, Mode=OneWay}" Grid.Row="1" Margin="24,0,0,6" FontSize="{StaticResource TextStyleMediumFontSize}"/>
-            <ListView x:Name="ActivityListView" Grid.Row="2" Margin="24,0" ItemsSource="{Binding Path=ListData, Mode=OneWay}" Background="#3FFFFFFF" SelectionMode="None" Height="310">
+            <ListView x:Name="ActivityListView" Grid.Row="2" Margin="24,0" ItemsSource="{Binding Path=ListData, Mode=OneWay}" Background="#3FFFFFFF" SelectionMode="None" MinHeight="310">
                 <ListView.ItemTemplate>
                     <DataTemplate>
                         <Grid Margin="0" Height="60" Width="{Binding ActualWidth, ElementName=ActivityListView, Mode=OneWay}">

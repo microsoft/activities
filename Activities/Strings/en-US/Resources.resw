@@ -124,13 +124,13 @@
     <value>The Activities developer sample application demonstrates Lumia SensorCore SDK's Activity Monitor API functionality.</value>
   </data>
   <data name="AboutDisclaimer.Text" xml:space="preserve">
-    <value>This developer sample application has been created to provide tips and best practice guidance for software developers and app designers, and may not have all the features you would expect in a commercial product. This application is published in Store as a free software as it may also have value to regular Nokia phone users. The source code and more information of this sample can be from GitHub:</value>
+    <value>This developer sample application has been created to provide tips and best practice guidance for software developers and app designers, and may not have all the features you would expect in a commercial product. This application is published in Store as a free software as it may also have value to regular phone users. The source code and more information of this sample can be from GitHub:</value>
   </data>
   <data name="AboutHyperlinkProject.Content" xml:space="preserve">
     <value>Activities project in GitHub</value>
   </data>
   <data name="AboutHyperlinkProject.NavigateUri" xml:space="preserve">
-    <value>https://github.com/nokia-developer/activities</value>
+    <value>https://github.com/Microsoft/activities</value>
   </data>
   <data name="AboutMore.Text" xml:space="preserve">
     <value>Learn more and get the latest version of this software from:</value>

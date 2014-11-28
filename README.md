@@ -14,7 +14,7 @@ total duration.
 The application will also register for receiving activity change notifications
 from the Lumia SensorCore and will display the change dynamically.
 
-For more information on implementation, visit Nokia Lumia Developer's Library: 
+For more information on implementation, visit Lumia Developer's Library: 
 http://developer.nokia.com/resources/library/Lumia/sensorcore-sdk/samples.html
 http://developer.nokia.com/resources/library/Lumia/sensorcore-sdk/activity-monitor-api.html
 

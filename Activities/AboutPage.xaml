@@ -7,26 +7,21 @@
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     mc:Ignorable="d"
     Background="#FF1bA1E2">
-
     <Grid x:Name="LayoutRoot">
-
         <Grid.ChildrenTransitions>
             <TransitionCollection>
                 <EntranceThemeTransition/>
             </TransitionCollection>
         </Grid.ChildrenTransitions>
-
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto"/>
             <RowDefinition Height="*"/>
         </Grid.RowDefinitions>
-
         <!-- TitlePanel -->
         <StackPanel Grid.Row="0" Margin="24,24,24,0">
             <TextBlock x:Uid="ApplicationName" Style="{ThemeResource TitleTextBlockStyle}" Typography.Capitals="SmallCaps" Foreground="White"/>
             <TextBlock x:Uid="AboutPage" Style="{ThemeResource HeaderTextBlockStyle}" Foreground="White"/>
         </StackPanel>
-
         <StackPanel x:Name="ContentPanel" Grid.Row="1" Margin="24,24,24,0">
             <RichTextBlock FontSize="16">
                 <Paragraph>
@@ -49,6 +44,5 @@
             <HyperlinkButton x:Uid="AboutHyperlinkProject" NavigateUri="http://"
                 Content="_project link" FontSize="24"/>
         </StackPanel>
-
     </Grid>
 </Page>

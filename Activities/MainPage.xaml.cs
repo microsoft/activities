@@ -1,20 +1,28 @@
-﻿/*
- * Copyright (c) 2014 Microsoft Mobile. All rights reserved.
- * See the license text file provided with this project for more information.
- */
+﻿/*	
+Copyright (c) 2015 Microsoft
 
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in
+all copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+THE SOFTWARE. 
+ */
 using System;
-using Windows.Foundation;
 using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
-using Windows.UI.Xaml.Controls.Primitives;
-using Windows.UI.Xaml.Data;
-using Windows.UI.Xaml.Input;
-using Windows.UI.Xaml.Media;
 using Windows.UI.Xaml.Navigation;
-using System.Windows;
-using System.Collections.Generic;
-using Windows.ApplicationModel.Core;
 using Windows.UI.Core;
 using Windows.UI.Popups;
 using System.Threading.Tasks;
@@ -25,6 +33,9 @@ using Windows.Security.ExchangeActiveSyncProvisioning;
 using Lumia.Sense.Testing;
 using Windows.ApplicationModel.Resources;
 
+/// <summary>
+/// The Basic Page item template is documented at http://go.microsoft.com/fwlink/?LinkID=390556
+/// </summary>
 namespace ActivitiesExample
 {
     /// <summary>
@@ -37,8 +48,16 @@ namespace ActivitiesExample
         /// Activity monitor instance
         /// </summary>
         private IActivityMonitor _activityMonitor = null;
+
+        /// <summary>
+        /// Check if running in emulator
+        /// </summary>
         private bool _runningInEmulator = false;
-        private readonly ResourceLoader resourceLoader = ResourceLoader.GetForCurrentView("Resources");
+
+        /// <summary>
+        /// Constructs a new ResourceLoader object
+        /// </summary>
+        private readonly ResourceLoader _resourceLoader = ResourceLoader.GetForCurrentView("Resources");
 
         #endregion
 
@@ -49,9 +68,7 @@ namespace ActivitiesExample
         {
             InitializeComponent();
             DataContext = MyData.Instance();
-
             Loaded += MainPage_Loaded;
-
             //Using this method to detect if the application runs in the emulator or on a real device. Later the *Simulator API is used to read fake sense data on emulator. 
             //In production code you do not need this and in fact you should ensure that you do not include the Lumia.Sense.Test reference in your project.
             EasClientDeviceInformation x = new EasClientDeviceInformation();
@@ -61,19 +78,23 @@ namespace ActivitiesExample
             }
         }
 
+        /// <summary>
+        /// Loaded event raised after the component is initialized
+        /// </summary>
+        /// <param name="sender">The sender of the event</param>
+        /// <param name="e">Event argument</param>
         async void MainPage_Loaded(object sender, RoutedEventArgs e)
         {       
             if (!_runningInEmulator && !await ActivityMonitor.IsSupportedAsync())
             {
-                // nothing to do if we cannot use the API
+                // Nothing to do if we cannot use the API
                 // In a real app please do make an effort to create a better user experience.
                 // e.g. if access to Activity Monitor is not mission critical, let the app run without showing any error message
                 // simply hide the features that depend on it
-                MessageDialog md = new MessageDialog(this.resourceLoader.GetString("FeatureNotSupported/Message"), this.resourceLoader.GetString("FeatureNotSupported/Title"));
+                MessageDialog md = new MessageDialog(this._resourceLoader.GetString("FeatureNotSupported/Message"), this._resourceLoader.GetString("FeatureNotSupported/Title"));
                 await md.ShowAsync(); 
                 Application.Current.Exit();
             }
-
             Initialize();
         }
 
@@ -92,14 +113,12 @@ namespace ActivitiesExample
                 {
                     await CallSensorCoreApiAsync(async () => { _activityMonitor = await ActivityMonitor.GetDefaultAsync(); });
                 }
-
                 if (_activityMonitor!=null)
                 {
                     // Set activity observer
                     _activityMonitor.ReadingChanged += activityMonitor_ReadingChanged;
                     _activityMonitor.Enabled = true;
-
-                    // read current activity
+                    // Read current activity
                     ActivityMonitorReading reading = null;
                     if (await CallSensorCoreApiAsync(async () => { reading = await _activityMonitor.GetCurrentReadingAsync(); }))
                     {
@@ -108,17 +127,15 @@ namespace ActivitiesExample
                             MyData.Instance().ActivityEnum = reading.Mode;
                         }
                     }
-
-                    // read logged data
+                    // Read logged data
                     PollHistory();
                 }
                 else
                 {
-                    // nothing to do if we cannot use the API
+                    // Nothing to do if we cannot use the API
                     // in a real app do make an effort to make the user experience better
                     Application.Current.Exit();
                 }
-
                 // Must call DeactivateAsync() when the application goes to background
                 Window.Current.VisibilityChanged += async (sender, args) =>
                 {
@@ -138,13 +155,12 @@ namespace ActivitiesExample
                     }
                 };
             }
-
         }
 
         /// <summary>
         /// Performs asynchronous Sense SDK operation and handles any exceptions
         /// </summary>
-        /// <param name="action"></param>
+        /// <param name="action">The function delegate to execute asynchronously when one task in the tasks completes</param>
         /// <returns><c>true</c> if call was successful, <c>false</c> otherwise</returns>
         private async Task<bool> CallSensorCoreApiAsync(Func<Task> action)
         {
@@ -158,7 +174,6 @@ namespace ActivitiesExample
                 failure = e;
                 Debug.WriteLine("Failure:" + e.Message);
             }
-
             if (failure != null)
             {
                 try
@@ -167,21 +182,19 @@ namespace ActivitiesExample
                     switch (SenseHelper.GetSenseError(failure.HResult))
                     {
                         case SenseError.LocationDisabled:
-                            dialog = new MessageDialog(this.resourceLoader.GetString("FeatureDisabled/Location"), this.resourceLoader.GetString("FeatureDisabled/Title"));
+                            dialog = new MessageDialog(this._resourceLoader.GetString("FeatureDisabled/Location"), this._resourceLoader.GetString("FeatureDisabled/Title"));
                             dialog.Commands.Add(new UICommand("Yes", new UICommandInvokedHandler(async (cmd) => await SenseHelper.LaunchLocationSettingsAsync())));
                             dialog.Commands.Add(new UICommand("No"));
                             await dialog.ShowAsync();
                             new System.Threading.ManualResetEvent(false).WaitOne(500);
                             return false;
-
                         case SenseError.SenseDisabled:
-                            dialog = new MessageDialog(this.resourceLoader.GetString("FeatureDisabled/MotionData"), this.resourceLoader.GetString("FeatureDisabled/InTitle"));
+                            dialog = new MessageDialog(this._resourceLoader.GetString("FeatureDisabled/MotionData"), this._resourceLoader.GetString("FeatureDisabled/InTitle"));
                             dialog.Commands.Add(new UICommand("Yes", new UICommandInvokedHandler(async (cmd) => await SenseHelper.LaunchSenseSettingsAsync())));
                             dialog.Commands.Add(new UICommand("No"));
                             await dialog.ShowAsync();
                             new System.Threading.ManualResetEvent(false).WaitOne(500);
                             return false;
-
                         default:
                             dialog = new MessageDialog("Failure: " + SenseHelper.GetSenseError(failure.HResult), "");
                             await dialog.ShowAsync();
@@ -246,7 +259,7 @@ namespace ActivitiesExample
             {
                 if (!await CallSensorCoreApiAsync(async () =>
                 {
-                        // get the data for the current 24h time window
+                        // Get the data for the current 24h time window
                         MyData.Instance().History = await _activityMonitor.GetActivityHistoryAsync(DateTime.Now.Date.AddDays(MyData.Instance().TimeWindow), new TimeSpan(24,0,0 ));
                 }))
                 {
@@ -255,19 +268,34 @@ namespace ActivitiesExample
             }
         }
 
+        /// <summary>
+        /// Navigate to about page
+        /// </summary>
+        /// <param name="sender">The sender of the event</param>
+        /// <param name="e">Event arguments</param>
         private void AboutButton_Click(object sender, RoutedEventArgs e)
         {
             this.Frame.Navigate(typeof(AboutPage));
         }
 
+        /// <summary>
+        /// Refresh data for the current day
+        /// </summary>
+        /// <param name="sender">The sender of the event</param>
+        /// <param name="e">Event arguments</param>
         private void RefreshButton_Click(object sender, RoutedEventArgs e)
         {
             PollHistory();
         }
 
-        private void prevButton_Click(object sender, RoutedEventArgs e)
+        /// <summary>
+        /// Read the data for the past day
+        /// </summary>
+        /// <param name="sender">The sender of the event</param>
+        /// <param name="e">Event arguments</param>
+        private void PrevButton_Click(object sender, RoutedEventArgs e)
         {
-            // move the time window 24 to the past
+            // Move the time window 24 to the past
             MyData.Instance().PreviousDay();
             nextButton.IsEnabled = true;
             prevButton.IsEnabled = MyData.Instance().TimeWindow > -10;
@@ -275,16 +303,19 @@ namespace ActivitiesExample
             PollHistory();
         }
 
-        private void nextButton_Click(object sender, RoutedEventArgs e)
+        /// <summary>
+        /// Read the data for the next day
+        /// </summary>
+        /// <param name="sender">The sender of the event</param>
+        /// <param name="e">Event arguments</param>
+        private void NextButton_Click(object sender, RoutedEventArgs e)
         {
-            // move the time window 24h to the present
+            // Move the time window 24h to the present
             MyData.Instance().NextDay();
             nextButton.IsEnabled = MyData.Instance().TimeWindow < 0;
             prevButton.IsEnabled = true;
             refreshButton.IsEnabled = MyData.Instance().TimeWindow == 0;
             PollHistory();
         }
-
     }
 }
-

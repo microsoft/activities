@@ -10,7 +10,6 @@
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     mc:Ignorable="d"
     Background="#FF1bA1E2">
-
     <Page.Resources>
         <converters:ElipsisVisible x:Key="VisibleElipsis"/>
         <converters:TimeSpanToString x:Key="TimeToString"/>
@@ -19,19 +18,16 @@
         <converters:ActivityToActivityHint x:Key="ActivityToHint"/>
         <converters:TimeWindowToString x:Key="TimeWindowToString"/>
     </Page.Resources>
-
     <Grid>
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto"/>
             <RowDefinition Height="*"/>
         </Grid.RowDefinitions>
-
         <!--TitlePanel contains the name of the application and page title-->
         <StackPanel x:Name="TitlePanel" Grid.Row="0"  Margin="24,24,24,0" >
             <TextBlock x:Uid="ApplicationSuite" Text="_SensorCore Example" Style="{ThemeResource TitleTextBlockStyle}" Typography.Capitals="SmallCaps" Foreground="White"/>
             <TextBlock x:Uid="ApplicationName"  Text="_activities" Style="{ThemeResource HeaderTextBlockStyle}" Foreground="White"/>
         </StackPanel>
-
         <!--ContentPanel - place additional content here-->
         <Grid Grid.Row="1" Margin="0">
             <Grid.RowDefinitions>
@@ -40,16 +36,13 @@
                 <RowDefinition Height="*"/>
                 <RowDefinition Height="Auto"/>
             </Grid.RowDefinitions>
-
             <!-- current activity text -->
             <StackPanel Grid.Row="0" Margin="24,24,0,24" VerticalAlignment="Center" HorizontalAlignment="Left">
                 <TextBlock x:Uid="CurrentActivityHeader" Text="_Current activity:"  FontSize="{StaticResource TextStyleMediumFontSize}" VerticalAlignment="Center"/>
                 <TextBlock Text="{Binding Path=CurrentActivity, Mode=OneWay}" HorizontalAlignment="Left" FontSize="{StaticResource TextStyleExtraLargePlusFontSize}" Margin="12,0,0,0" VerticalAlignment="Center" />
             </StackPanel>
-
             <!-- current activity icon -->
             <Image Source="{Binding CurrentActivity, Converter={StaticResource ActivityToIcon}}" Grid.Row="2" Height="300" Width="300" Opacity="0.3"/>
-
             <!-- List of activities -->
             <TextBlock Text="{Binding Path=TimeWindow, Converter={StaticResource ResourceKey=TimeWindowToString}, Mode=OneWay}" Grid.Row="1" Margin="24,0,0,6" FontSize="{StaticResource TextStyleMediumFontSize}"/>
             <ListView x:Name="ActivityListView" Grid.Row="2" Margin="24,0" ItemsSource="{Binding Path=ListData, Mode=OneWay}" Background="#3FFFFFFF" SelectionMode="None" MinHeight="310">
@@ -85,7 +78,6 @@
                     </DataTemplate>
                 </ListView.ItemTemplate>
             </ListView>
-
             <!-- x coordinates -->
             <Grid Grid.Row="4" Margin="24,0,24,12" >
                 <Grid.ColumnDefinitions>
@@ -103,10 +95,9 @@
             </Grid>
         </Grid>
     </Grid>
-
     <Page.BottomAppBar>
         <CommandBar Opacity="0.5">
-            <AppBarButton x:Uid="PrevButton" x:Name="prevButton" Label="_previous" IsEnabled="True" Click="prevButton_Click" >
+            <AppBarButton x:Uid="PrevButton" x:Name="prevButton" Label="_previous" IsEnabled="True" Click="PrevButton_Click" >
                 <AppBarButton.Icon>
                     <BitmapIcon UriSource="/Assets/back.png"/>
                 </AppBarButton.Icon>
@@ -116,16 +107,14 @@
                     <BitmapIcon UriSource="/Assets/refresh.png"/>
                 </AppBarButton.Icon>
             </AppBarButton>
-            <AppBarButton x:Uid="NextButton" x:Name="nextButton" Label="_next" IsEnabled="False" Click="nextButton_Click" >
+            <AppBarButton x:Uid="NextButton" x:Name="nextButton" Label="_next" IsEnabled="False" Click="NextButton_Click" >
                 <AppBarButton.Icon>
                     <BitmapIcon UriSource="/Assets/next.png"/>
                 </AppBarButton.Icon>
             </AppBarButton>
             <CommandBar.SecondaryCommands>
-                <!-- <AppBarButton x:Uid="Refresh" Label="_refresh _todays' _activities" Click="RefreshButton_Click"/> -->
                 <AppBarButton x:Uid="About" Label="_about" Click="AboutButton_Click"/>
             </CommandBar.SecondaryCommands>
         </CommandBar>
     </Page.BottomAppBar>
-
 </Page>

@@ -1,4 +1,5 @@
 ﻿/*	
+The MIT License (MIT)
 Copyright (c) 2015 Microsoft
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -32,6 +33,7 @@ using ActivitiesExample.Data;
 using Windows.Security.ExchangeActiveSyncProvisioning;
 using Lumia.Sense.Testing;
 using Windows.ApplicationModel.Resources;
+using ActivitiesExample.ActivateSensorCore;
 
 /// <summary>
 /// The Basic Page item template is documented at http://go.microsoft.com/fwlink/?LinkID=390556
@@ -59,6 +61,9 @@ namespace ActivitiesExample
         /// </summary>
         private readonly ResourceLoader _resourceLoader = ResourceLoader.GetForCurrentView("Resources");
 
+        ///  The application model
+        /// </summary>
+        private ActivitiesExample.App _app = Application.Current as ActivitiesExample.App;
         #endregion
 
         /// <summary>
@@ -72,7 +77,7 @@ namespace ActivitiesExample
             //Using this method to detect if the application runs in the emulator or on a real device. Later the *Simulator API is used to read fake sense data on emulator. 
             //In production code you do not need this and in fact you should ensure that you do not include the Lumia.Sense.Test reference in your project.
             EasClientDeviceInformation x = new EasClientDeviceInformation();
-            if(x.SystemProductName.StartsWith("Virtual"))
+            if (x.SystemProductName.StartsWith("Virtual"))
             {
                 _runningInEmulator = true;
             }
@@ -84,7 +89,7 @@ namespace ActivitiesExample
         /// <param name="sender">The sender of the event</param>
         /// <param name="e">Event argument</param>
         async void MainPage_Loaded(object sender, RoutedEventArgs e)
-        {       
+        {
             if (!_runningInEmulator && !await ActivityMonitor.IsSupportedAsync())
             {
                 // Nothing to do if we cannot use the API
@@ -92,10 +97,9 @@ namespace ActivitiesExample
                 // e.g. if access to Activity Monitor is not mission critical, let the app run without showing any error message
                 // simply hide the features that depend on it
                 MessageDialog md = new MessageDialog(this._resourceLoader.GetString("FeatureNotSupported/Message"), this._resourceLoader.GetString("FeatureNotSupported/Title"));
-                await md.ShowAsync(); 
+                await md.ShowAsync();
                 Application.Current.Exit();
             }
-            Initialize();
         }
 
         /// <summary>
@@ -103,17 +107,71 @@ namespace ActivitiesExample
         /// </summary>
         private async void Initialize()
         {
+            if (!(await ActivityMonitor.IsSupportedAsync()))
+            {
+                MessageDialog dlg = new MessageDialog("Unfortunately this device does not support activities.");
+                await dlg.ShowAsync();
+                Application.Current.Exit();
+            }
+            else
+            {
+                uint apiSet = await SenseHelper.GetSupportedApiSetAsync();
+                MotionDataSettings settings = await SenseHelper.GetSettingsAsync();
+                // Devices with old location settings
+                if (settings.Version < 2 && !settings.LocationEnabled)
+                {
+                    MessageDialog dlg = new MessageDialog("In order to recognize activities you need to enable location in system settings. Do you want to open settings now? if no, applicatoin will exit", "Information");
+                    dlg.Commands.Add(new UICommand("Yes", new UICommandInvokedHandler(async (cmd) => await SenseHelper.LaunchLocationSettingsAsync())));
+                    dlg.Commands.Add(new UICommand("No", new UICommandInvokedHandler((cmd) =>{ Application.Current.Exit();})));
+                    await dlg.ShowAsync();
+                }
+                if (!settings.PlacesVisited)
+                {
+                    MessageDialog dlg = null;
+                    if (settings.Version < 2)
+                    {
+                        //device which has old motion data settings.
+                        //this is equal to motion data settings on/off in old system settings(SDK1.0 based)
+                        dlg = new MessageDialog("In order to recognize activities you need to enable Motion data in Motion data settings. Do you want to open settings now? if no, application will exit", "Information");
+                        dlg.Commands.Add(new UICommand("Yes", new UICommandInvokedHandler(async (cmd) => await SenseHelper.LaunchSenseSettingsAsync())));
+                        dlg.Commands.Add(new UICommand("No", new UICommandInvokedHandler((cmd) =>{ Application.Current.Exit();})));
+                        await dlg.ShowAsync();
+                    }
+                    else
+                    {
+                        dlg = new MessageDialog("In order to recognize activities you need to 'enable Places visited' and 'DataQuality to detailed' in Motion data settings. Do you want to open settings now? ", "Information");
+                        dlg.Commands.Add(new UICommand("Yes", new UICommandInvokedHandler(async (cmd) => await SenseHelper.LaunchSenseSettingsAsync())));
+                        dlg.Commands.Add(new UICommand("No"));
+                        await dlg.ShowAsync();
+                    }
+                }
+                else if (apiSet >= 3 && settings.DataQuality == DataCollectionQuality.Basic)
+                {
+                    MessageDialog dlg = new MessageDialog("In order to recognize biking you need to enable detailed data collection in Motion data settings. Do you want to open settings now?", "Information");
+                    dlg.Commands.Add(new UICommand("Yes", new UICommandInvokedHandler(async (cmd) => await SenseHelper.LaunchSenseSettingsAsync())));
+                    dlg.Commands.Add(new UICommand("No"));
+                    await dlg.ShowAsync();
+                }
+            }
             if (_activityMonitor == null)
             {
-                if(_runningInEmulator)
+                if (_runningInEmulator)
                 {
-                    await CallSensorCoreApiAsync(async () => { _activityMonitor = await ActivityMonitorSimulator.GetDefaultAsync(); });
+                    if (await CallSensorCoreApiAsync(async () => { _activityMonitor = await ActivityMonitorSimulator.GetDefaultAsync(); }))
+                    {
+                        Debug.WriteLine("ActivityMonitorSimulator initialized.");
+                    }
+                    else return;
                 }
                 else
                 {
-                    await CallSensorCoreApiAsync(async () => { _activityMonitor = await ActivityMonitor.GetDefaultAsync(); });
+                    if (await CallSensorCoreApiAsync(async () => { _activityMonitor = await ActivityMonitor.GetDefaultAsync(); }))
+                    {
+                        Debug.WriteLine("ActivityMonitor initialized.");
+                    }
+                    else return;
                 }
-                if (_activityMonitor!=null)
+                if (_activityMonitor != null)
                 {
                     // Set activity observer
                     _activityMonitor.ReadingChanged += activityMonitor_ReadingChanged;
@@ -177,23 +235,16 @@ namespace ActivitiesExample
             if (failure != null)
             {
                 try
-                { 
+                {
                     MessageDialog dialog = null;
                     switch (SenseHelper.GetSenseError(failure.HResult))
                     {
                         case SenseError.LocationDisabled:
-                            dialog = new MessageDialog(this._resourceLoader.GetString("FeatureDisabled/Location"), this._resourceLoader.GetString("FeatureDisabled/Title"));
-                            dialog.Commands.Add(new UICommand("Yes", new UICommandInvokedHandler(async (cmd) => await SenseHelper.LaunchLocationSettingsAsync())));
-                            dialog.Commands.Add(new UICommand("No"));
-                            await dialog.ShowAsync();
-                            new System.Threading.ManualResetEvent(false).WaitOne(500);
-                            return false;
                         case SenseError.SenseDisabled:
-                            dialog = new MessageDialog(this._resourceLoader.GetString("FeatureDisabled/MotionData"), this._resourceLoader.GetString("FeatureDisabled/InTitle"));
-                            dialog.Commands.Add(new UICommand("Yes", new UICommandInvokedHandler(async (cmd) => await SenseHelper.LaunchSenseSettingsAsync())));
-                            dialog.Commands.Add(new UICommand("No"));
-                            await dialog.ShowAsync();
-                            new System.Threading.ManualResetEvent(false).WaitOne(500);
+                            if (!_app.SensorCoreActivationStatus.onGoing)
+                            {
+                                this.Frame.Navigate(typeof(ActivateSensorCore.ActivateSensorCore));
+                            }
                             return false;
                         default:
                             dialog = new MessageDialog("Failure: " + SenseHelper.GetSenseError(failure.HResult), "");
@@ -217,11 +268,28 @@ namespace ActivitiesExample
         /// Called when navigating to this page
         /// </summary>
         /// <param name="e">Event arguments</param>
-        protected override void OnNavigatedTo(NavigationEventArgs e)
+        protected override async void OnNavigatedTo(NavigationEventArgs e)
         {
+            ActivateSensorCoreStatus status = _app.SensorCoreActivationStatus;
+            if (e.NavigationMode == NavigationMode.Back && status.onGoing)
+            {
+                status.onGoing = false;
+                if (status.activationRequestResult != ActivationRequestResults.AllEnabled)
+                {
+                    MessageDialog dialog = new MessageDialog(_resourceLoader.GetString("NoLocationOrMotionDataError/Text"), _resourceLoader.GetString("Information/Text"));
+                    dialog.Commands.Add(new UICommand("Ok", new UICommandInvokedHandler(async (cmd) => await SenseHelper.LaunchSenseSettingsAsync())));
+                    await dialog.ShowAsync();
+                    new System.Threading.ManualResetEvent(false).WaitOne(500);
+                    Application.Current.Exit();
+                }
+            }
             if (_activityMonitor != null)
             {
                 _activityMonitor.ReadingChanged += activityMonitor_ReadingChanged;
+            }
+            else
+            {
+                Initialize();
             }
         }
 
@@ -246,7 +314,7 @@ namespace ActivitiesExample
         {
             await this.Dispatcher.RunAsync(CoreDispatcherPriority.Normal, () =>
             {
-                MyData.Instance().ActivityEnum = args.Mode;   
+                MyData.Instance().ActivityEnum = args.Mode;
             });
         }
 
@@ -259,8 +327,8 @@ namespace ActivitiesExample
             {
                 if (!await CallSensorCoreApiAsync(async () =>
                 {
-                        // Get the data for the current 24h time window
-                        MyData.Instance().History = await _activityMonitor.GetActivityHistoryAsync(DateTime.Now.Date.AddDays(MyData.Instance().TimeWindow), new TimeSpan(24,0,0 ));
+                    // Get the data for the current 24h time window
+                    MyData.Instance().History = await _activityMonitor.GetActivityHistoryAsync(DateTime.Now.Date.AddDays(MyData.Instance().TimeWindow), new TimeSpan(24, 0, 0));
                 }))
                 {
                     Debug.WriteLine("Reading the history failed.");

@@ -77,6 +77,8 @@ file the capabilities required for it to work:
 	
 3. Version history
 --------------------------------------------------------------------------------
+* Version 1.1.0.17: 
+  * Updated to use latest Lumia SensorCore SDK 1.1 Preview
 * Version 1.1.0.13: 
  * Some bug fixes made in this release. 
 * Version 1.0: The first release.
@@ -86,6 +88,7 @@ file the capabilities required for it to work:
 
 | Project | Release | Download |
 | ------- | --------| -------- |
+| Activities | v1.1.0.17 | [activities-1.1.0.17.zip](https://github.com/Microsoft/activities/archive/v1.1.0.17.zip) |
 | Activities | v1.1.0.13 | [activities-1.1.0.13.zip](https://github.com/Microsoft/activities/archive/v1.1.0.13.zip) |
 | Activities | v1.0 | [activities-1.0.zip](https://github.com/Microsoft/activities/archive/v1.0.zip) |
 

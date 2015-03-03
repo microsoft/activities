@@ -1,4 +1,5 @@
 ﻿/*	
+The MIT License (MIT)
 Copyright (c) 2015 Microsoft
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -18,7 +19,7 @@ AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
 LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE. 
- */
+ */ 
 using Lumia.Sense;
 using System;
 using System.Collections.Generic;
@@ -69,6 +70,15 @@ namespace ActivitiesExample.Converters
                     break;
                 case "running":
                     hint = this._resourceLoader.GetString("Hint/Running");
+                    break;
+                case "biking":
+                    hint = this._resourceLoader.GetString("Hint/Biking");
+                    break;
+                case "moving in vehicle":
+                    hint = this._resourceLoader.GetString("Hint/MovingInVehicle");
+                    break;
+                case "unknown":
+                    hint = this._resourceLoader.GetString("Hint/Unknown");
                     break;
                 default: break;
             }           

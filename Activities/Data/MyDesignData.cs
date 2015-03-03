@@ -1,4 +1,5 @@
 ﻿/*	
+The MIT License (MIT)
 Copyright (c) 2015 Microsoft
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -80,6 +81,9 @@ namespace ActivitiesExample.Data
                 _listData.Add(new MyQuantifiedData("Stationary", new TimeSpan(1, 0, 0)));
                 _listData.Add(new MyQuantifiedData("Walking", new TimeSpan(2, 0, 0)));
                 _listData.Add(new MyQuantifiedData("Running", new TimeSpan(3, 0, 0)));
+                _listData.Add(new MyQuantifiedData("Biking", new TimeSpan(5, 0, 0)));
+                _listData.Add(new MyQuantifiedData("Moving in vehicle", new TimeSpan(1, 0, 0)));
+                _listData.Add(new MyQuantifiedData("Unknwon", new TimeSpan(1, 0, 0)));
             }
         }
 

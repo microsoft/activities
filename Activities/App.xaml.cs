@@ -1,4 +1,5 @@
 ﻿/*	
+The MIT License (MIT)
 Copyright (c) 2015 Microsoft
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -26,6 +27,7 @@ using Windows.Phone.UI.Input;
 using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
 using Windows.UI.Xaml.Navigation;
+using ActivitiesExample.ActivateSensorCore;
 
 /// <summary>
 /// The Basic Page item template is documented at http://go.microsoft.com/fwlink/?LinkID=390556
@@ -37,6 +39,28 @@ namespace ActivitiesExample
     /// </summary>
     sealed partial class App : Application
     {
+        #region Private members
+        /// <summary>
+        /// Status of SensorCore
+        /// </summary>
+        private ActivateSensorCoreStatus _sensorCoreActivationStatus = new ActivateSensorCoreStatus();
+        #endregion
+
+        /// <summary>
+        /// Gets or sets the status of SensorCore
+        /// </summary>
+        public ActivateSensorCoreStatus SensorCoreActivationStatus
+        {
+            get
+            {
+                return _sensorCoreActivationStatus;
+            }
+            private set
+            {
+                _sensorCoreActivationStatus = value;
+            }
+        }
+
         /// <summary>
         /// Initializes the singleton application object.  This is the first line of authored code
         /// executed, and as such is the logical equivalent of main() or WinMain().

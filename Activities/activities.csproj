@@ -14,7 +14,7 @@
     <MinimumVisualStudioVersion>12</MinimumVisualStudioVersion>
     <FileAlignment>512</FileAlignment>
     <ProjectTypeGuids>{76F1466A-8B6D-4E39-A767-685A06062A39};{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}</ProjectTypeGuids>
-    <AppxAutoIncrementPackageRevision>True</AppxAutoIncrementPackageRevision>
+    <AppxAutoIncrementPackageRevision>False</AppxAutoIncrementPackageRevision>
     <AppxSymbolPackageEnabled>False</AppxSymbolPackageEnabled>
     <AppxBundlePlatforms>arm</AppxBundlePlatforms>
     <PackageCertificateThumbprint>5F7524CDD75F3F41BAC31F01C368A249D987521B</PackageCertificateThumbprint>
@@ -75,8 +75,6 @@
     <UseVSHostingProcess>false</UseVSHostingProcess>
     <ErrorReport>prompt</ErrorReport>
     <Prefer32Bit>true</Prefer32Bit>
-    <DocumentationFile>
-    </DocumentationFile>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Release|x86'">
     <OutputPath>bin\x86\Release\</OutputPath>
@@ -93,6 +91,10 @@
     <Compile Include="AboutPage.xaml.cs">
       <DependentUpon>AboutPage.xaml</DependentUpon>
     </Compile>
+    <Compile Include="ActivateSensorCore\ActivateSensorCore.xaml.cs">
+      <DependentUpon>ActivateSensorCore.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="ActivateSensorCore\SensorCoreActivationStatus.cs" />
     <Compile Include="App.xaml.cs">
       <DependentUpon>App.xaml</DependentUpon>
     </Compile>
@@ -123,25 +125,27 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>
+    <Page Include="ActivateSensorCore\ActivateSensorCore.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="MainPage.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>
   </ItemGroup>
   <ItemGroup>
+    <Content Include="Assets\Activities\biking.png" />
+    <Content Include="Assets\Activities\movinginvehicle.png" />
     <Content Include="Assets\Activities\idle.png">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
     <Content Include="Assets\Activities\moving.png" />
+    <Content Include="Assets\Activities\running.png" />
     <Content Include="Assets\Activities\stationary.png">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <Content Include="Assets\Activities\running.png">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <Content Include="Assets\Activities\walking.png">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
+    <Content Include="Assets\Activities\walking.png" />
     <Content Include="Assets\back.png" />
     <Content Include="Assets\next.png" />
     <Content Include="Assets\refresh.png" />
@@ -158,32 +162,13 @@
   <ItemGroup>
     <None Include="Help\LumiaSensorCoreSDK.chm" />
     <None Include="packages.config" />
+    <PRIResource Include="Strings\en-US\ActivateSensorCore.resw" />
   </ItemGroup>
-  <ItemGroup>
-    <Reference Include="Lumia.Sense, Version=255.255.255.255, Culture=neutral, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\packages\LumiaSensorCoreSDK.1.0.3.263\lib\portable-wpa81+wp81\x86\Lumia.Sense.winmd</HintPath>
-    </Reference>
-    <Reference Include="Lumia.Sense.Testing, Version=255.255.255.255, Culture=neutral, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\packages\LumiaSensorCoreSDKTesting.1.0.3.263\lib\portable-wpa81+wp81\x86\Lumia.Sense.Testing.winmd</HintPath>
-    </Reference>
-  </ItemGroup>
-  <PropertyGroup Condition=" '$(VisualStudioVersion)' == '' or '$(VisualStudioVersion)' &lt; '12.0' ">
+   <PropertyGroup Condition=" '$(VisualStudioVersion)' == '' or '$(VisualStudioVersion)' &lt; '12.0' ">
     <VisualStudioVersion>12.0</VisualStudioVersion>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(TargetPlatformIdentifier)' == '' ">
     <TargetPlatformIdentifier>WindowsPhoneApp</TargetPlatformIdentifier>
   </PropertyGroup>
   <Import Project="$(MSBuildExtensionsPath)\Microsoft\WindowsXaml\v$(VisualStudioVersion)\$(TargetPlatformVersion)\Microsoft.Windows.UI.Xaml.CSharp.targets" />
-  <Import Project="$(SolutionDir)\.nuget\NuGet.targets" Condition="Exists('$(SolutionDir)\.nuget\NuGet.targets')" />
-  <Import Project="..\packages\LumiaSensorCoreSDK.1.0.3.263\build\wpa81\LumiaSensorCoreSDK.targets" Condition="Exists('..\packages\LumiaSensorCoreSDK.1.0.3.263\build\wpa81\LumiaSensorCoreSDK.targets')" />
-  <Import Project="..\packages\LumiaSensorCoreSDKTesting.1.0.3.263\build\wpa81\LumiaSensorCoreSDKTesting.targets" Condition="Exists('..\packages\LumiaSensorCoreSDKTesting.1.0.3.263\build\wpa81\LumiaSensorCoreSDKTesting.targets')" />
-  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
-       Other similar extension points exist, see Microsoft.Common.targets.
-  <Target Name="BeforeBuild">
-  </Target>
-  <Target Name="AfterBuild">
-  </Target>
-  -->
 </Project>

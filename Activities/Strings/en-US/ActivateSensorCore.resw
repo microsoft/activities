@@ -117,111 +117,28 @@
   <resheader name="writer">
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
-  <data name="About.Label" xml:space="preserve">
-    <value>about</value>
+  <data name="LaterButton.Content" xml:space="preserve">
+    <value>Later</value>
   </data>
-  <data name="AboutDescription.Text" xml:space="preserve">
-    <value>The Activities developer sample application demonstrates Lumia SensorCore SDK's Activity Monitor API functionality.</value>
+  <data name="LocationActivationButton.Content" xml:space="preserve">
+    <value>Switch on</value>
   </data>
-  <data name="AboutDisclaimer.Text" xml:space="preserve">
-    <value>This developer sample application has been created to provide tips and best practice guidance for software developers and app designers, and may not have all the features you would expect in a commercial product. This application is published in Store as a free software as it may also have value to regular phone users. The source code and more information of this sample can be from GitHub:</value>
+  <data name="LocationActivationExplanation.Text" xml:space="preserve">
+    <value>This application requires location data in order to work correctly</value>
   </data>
-  <data name="AboutHyperlinkProject.Content" xml:space="preserve">
-    <value>Activities project in GitHub</value>
+  <data name="LocationActivationTitle.Text" xml:space="preserve">
+    <value>Switch on location data</value>
   </data>
-  <data name="AboutHyperlinkProject.NavigateUri" xml:space="preserve">
-    <value>https://github.com/Microsoft/activities</value>
+  <data name="MotionDataActivationButton.Content" xml:space="preserve">
+    <value>Switch on</value>
   </data>
-  <data name="AboutMore.Text" xml:space="preserve">
-    <value>Learn more and get the latest version of this software from:</value>
+  <data name="MotionDataActivationExplanation.Text" xml:space="preserve">
+    <value>This application requires motion data in order to work correctly</value>
   </data>
-  <data name="AboutPage.Text" xml:space="preserve">
-    <value>about</value>
+  <data name="MotionDataActivationTitle.Text" xml:space="preserve">
+    <value>Switch on motion data</value>
   </data>
-  <data name="ActivitiesListHeader.Text" xml:space="preserve">
-    <value>Today's activities:</value>
-  </data>
-  <data name="ApplicationName.Text" xml:space="preserve">
-    <value>activities</value>
-  </data>
-  <data name="ApplicationSuite.Text" xml:space="preserve">
-    <value>LUMIA SENSORCORE SAMPLE</value>
-  </data>
-  <data name="BikingFeatureDisabled.DataCollectionQuality" xml:space="preserve">
-    <value>In order to recognize biking or moving in vehicle you need to enable detailed data collection in Motion data settings. Do you want to open settings now?</value>
-  </data>
-  <data name="CurrentActivityHeader.Text" xml:space="preserve">
-    <value>Current activity:</value>
-  </data>
-  <data name="DetailedSetting.DataCollectionQuality" xml:space="preserve">
-    <value>To get more accurate data you need to enable detailed data collection in Motion data settings. Do you want to open settings now?</value>
-  </data>
-  <data name="FeatureDisabled.Location" xml:space="preserve">
-    <value>Location has been disabled. Do you want to open Location settings now?</value>
-  </data>
-  <data name="FeatureDisabled.MotionData" xml:space="preserve">
-    <value>Motion data has been disabled. Do you want to open Motion data settings now?</value>
-  </data>
-  <data name="FeatureDisabled.MotionDataSettings" xml:space="preserve">
-    <value>Unfortunately this device does not support biking or moving in vehicle recognition</value>
-  </data>
-  <data name="FeatureDisabled.Title" xml:space="preserve">
-    <value>Information</value>
-  </data>
-  <data name="FeatureNotSupported.Message" xml:space="preserve">
-    <value>Sorry, the feature exemplified by this application is not available on your phone.
-
-The application will now exit.</value>
-  </data>
-  <data name="FeatureNotSupported.Title" xml:space="preserve">
-    <value>Lumia SensorCore</value>
-  </data>
-  <data name="Hint.Biking" xml:space="preserve">
-    <value>Biking activity</value>
-  </data>
-  <data name="Hint.Idle" xml:space="preserve">
-    <value>The phone was laying still, for example, on a table.</value>
-  </data>
-  <data name="Hint.Moving" xml:space="preserve">
-    <value>Some movement was detected, other than walking or running.</value>
-  </data>
-  <data name="Hint.MovingInVehicle" xml:space="preserve">
-    <value>Moving in vehicle</value>
-  </data>
-  <data name="Hint.Running" xml:space="preserve">
-    <value>The user was running with the phone.</value>
-  </data>
-  <data name="Hint.Stationary" xml:space="preserve">
-    <value>The phone was handled but the user was not moving around.</value>
-  </data>
-  <data name="Hint.Unknown" xml:space="preserve">
-    <value>Activity could not be determined, for example the device is swithced off</value>
-  </data>
-  <data name="Hint.Walking" xml:space="preserve">
-    <value>The user was walking with the phone.</value>
-  </data>
-  <data name="NextButton.Label" xml:space="preserve">
-    <value>next day</value>
-  </data>
-  <data name="NoLocationOrMotionDataError.Text" xml:space="preserve">
-    <value>This application does not function without location and motion data. The application will be closed.</value>
-  </data>
-  <data name="PrevButton.Label" xml:space="preserve">
-    <value>previous day</value>
-  </data>
-  <data name="Refresh.Label" xml:space="preserve">
-    <value>refresh todays' activities</value>
-  </data>
-  <data name="RefreshButton.Label" xml:space="preserve">
-    <value>update diagram</value>
-  </data>
-  <data name="TimeWindow.Today" xml:space="preserve">
-    <value>Today</value>
-  </data>
-  <data name="TimeWindow.Yesterday" xml:space="preserve">
-    <value>Yesterday</value>
-  </data>
-  <data name="VersionText.Text" xml:space="preserve">
-    <value>Activities version: </value>
+  <data name="NeverButton.Content" xml:space="preserve">
+    <value>Do not ask again</value>
   </data>
 </root>

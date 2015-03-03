@@ -48,7 +48,7 @@
             <ListView x:Name="ActivityListView" Grid.Row="2" Margin="24,0" ItemsSource="{Binding Path=ListData, Mode=OneWay}" Background="#3FFFFFFF" SelectionMode="None" MinHeight="310">
                 <ListView.ItemTemplate>
                     <DataTemplate>
-                        <Grid Margin="0" Height="60" Width="{Binding ActualWidth, ElementName=ActivityListView, Mode=OneWay}">
+                        <Grid Margin="0" Width="{Binding ActualWidth, ElementName=ActivityListView, Mode=OneWay}">
                             <Grid.RowDefinitions >
                                 <RowDefinition Height="10"/>
                                 <RowDefinition Height="auto"/>
@@ -66,20 +66,20 @@
                                 <TextBlock Text="{Binding Path=ActivityTime, Converter={StaticResource ResourceKey=TimeToString}}" FontSize="{StaticResource TextStyleMediumFontSize}" Foreground="White" Margin="12,0,0,0" VerticalAlignment="Center"/>
                             </StackPanel>
                             <!-- Activity description -->
-                            <TextBlock Grid.Row="2" Text="{Binding Path=ActivityName, Converter={StaticResource ResourceKey=ActivityToHint}}" FontSize="{StaticResource TextStyleSmallFontSize}" Foreground="White" VerticalAlignment="Center" Margin="12,1,12.667,5.833" Height="14"/>
+                            <TextBlock Grid.Row="2" Text="{Binding Path=ActivityName, Converter={StaticResource ResourceKey=ActivityToHint}}" FontSize="{StaticResource TextStyleSmallFontSize}" Foreground="White" VerticalAlignment="Center" Margin="12,0,0,0" TextWrapping="Wrap" />
                             <!-- Activity duration as a rectangle -->
-                            <Rectangle Grid.Row="3" Grid.Column="0" Width="{Binding Path=ActivityTime, Converter={StaticResource ResourceKey=TimeToWidth}}" Height="6" Fill="White" VerticalAlignment="Top" HorizontalAlignment="Left"/>
+                            <Rectangle Grid.Row="3" Margin="0,6,0,0" Grid.Column="0" Width="{Binding Path=ActivityTime, Converter={StaticResource ResourceKey=TimeToWidth}}" Height="6" Fill="White" VerticalAlignment="Top" HorizontalAlignment="Left"/>
                             <!-- Elipsis added to the end of rectangle if duration > 12h -->
                             <StackPanel Grid.Row="3" Grid.Column="1" Orientation="Horizontal" Visibility="{Binding ActivityTime, Converter={StaticResource VisibleElipsis}}">
-                                <Rectangle Margin="6,0,0,0" Width="6" Height="6" Fill="White" HorizontalAlignment="Left" VerticalAlignment="Top"/>
-                                <Rectangle Margin="6,0,0,0" Width="6" Height="6" Fill="White" HorizontalAlignment="Right" VerticalAlignment="Top"/>
+                                <Rectangle Margin="6,6,0,0" Width="6" Height="6" Fill="White" HorizontalAlignment="Left" VerticalAlignment="Top"/>
+                                <Rectangle Margin="6,6,0,0" Width="6" Height="6" Fill="White" HorizontalAlignment="Right" VerticalAlignment="Top"/>
                             </StackPanel>
                         </Grid>
                     </DataTemplate>
                 </ListView.ItemTemplate>
             </ListView>
             <!-- x coordinates -->
-            <Grid Grid.Row="4" Margin="24,0,24,12" >
+            <Grid Grid.Row="3" Margin="24,0,24,12" >
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="2*"/>
                     <ColumnDefinition Width="3*"/>

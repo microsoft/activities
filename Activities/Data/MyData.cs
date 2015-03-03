@@ -1,4 +1,5 @@
-﻿/*	
+﻿/*
+The MIT License (MIT)
 Copyright (c) 2015 Microsoft
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -285,7 +286,8 @@ namespace ActivitiesExample.Data
         /// </summary>
         public MyQuantifiedData(string s, TimeSpan i)
         {
-            ActivityName = s;
+            //Split activity string by capital letter
+            ActivityName = System.Text.RegularExpressions.Regex.Replace(s, @"([A-Z])(?<=[a-z]\1|[A-Za-z]\1(?=[a-z]))", " $1"); 
             ActivityTime = i;
         }
 

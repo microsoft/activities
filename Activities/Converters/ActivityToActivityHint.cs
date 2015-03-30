@@ -19,7 +19,7 @@ AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
 LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE. 
- */ 
+ */
 using Lumia.Sense;
 using System;
 using System.Collections.Generic;
@@ -40,7 +40,7 @@ namespace ActivitiesExample.Converters
         /// <summary>
         /// Constructs a new ResourceLoader object
         /// </summary>
-        private readonly ResourceLoader _resourceLoader = ResourceLoader.GetForCurrentView("Resources");
+        private readonly ResourceLoader _resourceLoader = ResourceLoader.GetForCurrentView( "Resources" );
         #endregion
 
         /// <summary>
@@ -51,37 +51,38 @@ namespace ActivitiesExample.Converters
         /// <param name="parameter">An optional parameter to be used in the converter logic.</param>
         /// <param name="language">The language of the conversion.</param>
         /// <returns>The value to be passed to the target dependency property.</returns>
-        public object Convert(object value, Type targetType, object parameter, string language)
+        public object Convert( object value, Type targetType, object parameter, string language )
         {
             string hint = "";
-            switch(((string)value).ToLower())
+            switch( (Activity)value )
             {
-                case "moving":
-                    hint = this._resourceLoader.GetString("Hint/Moving");
+                case Activity.Moving:
+                    hint = this._resourceLoader.GetString( "Hint/Moving" );
                     break;
-                case "idle":
-                    hint = this._resourceLoader.GetString("Hint/Idle");
+                case Activity.Idle:
+                    hint = this._resourceLoader.GetString( "Hint/Idle" );
                     break;
-                case "stationary":
-                    hint = this._resourceLoader.GetString("Hint/Stationary");
+                case Activity.Stationary:
+                    hint = this._resourceLoader.GetString( "Hint/Stationary" );
                     break;
-                case "walking":
-                    hint = this._resourceLoader.GetString("Hint/Walking");
+                case Activity.Walking:
+                    hint = this._resourceLoader.GetString( "Hint/Walking" );
                     break;
-                case "running":
-                    hint = this._resourceLoader.GetString("Hint/Running");
+                case Activity.Running:
+                    hint = this._resourceLoader.GetString( "Hint/Running" );
                     break;
-                case "biking":
-                    hint = this._resourceLoader.GetString("Hint/Biking");
+                case Activity.Biking:
+                    hint = this._resourceLoader.GetString( "Hint/Biking" );
                     break;
-                case "moving in vehicle":
-                    hint = this._resourceLoader.GetString("Hint/MovingInVehicle");
+                case Activity.MovingInVehicle:
+                    hint = this._resourceLoader.GetString( "Hint/MovingInVehicle" );
                     break;
-                case "unknown":
-                    hint = this._resourceLoader.GetString("Hint/Unknown");
+                case Activity.Unknown:
+                    hint = this._resourceLoader.GetString( "Hint/Unknown" );
                     break;
-                default: break;
-            }           
+                default:
+                    break;
+            }
             return hint;
         }
 
@@ -93,7 +94,7 @@ namespace ActivitiesExample.Converters
         /// <param name="parameter">An optional parameter to be used in the converter logic.</param>
         /// <param name="language">The language of the conversion.</param>
         /// <returns>The value to be passed to the target dependency property.</returns>
-        public object ConvertBack(object value, Type targetType, object parameter, string language)
+        public object ConvertBack( object value, Type targetType, object parameter, string language )
         {
             string result = "";
             return result;

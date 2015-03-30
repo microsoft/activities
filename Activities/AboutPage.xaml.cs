@@ -52,22 +52,22 @@ namespace ActivitiesExample
         /// </summary>
         /// <param name="sender">The sender of the event</param>
         /// <param name="e">Event arguments</param>
-        async void AboutPage_Loaded(object sender, RoutedEventArgs e)
+        async void AboutPage_Loaded( object sender, RoutedEventArgs e )
         {
             string version = "";
-            var uri = new System.Uri("ms-appx:///AppxManifest.xml");
-            StorageFile file = await StorageFile.GetFileFromApplicationUriAsync(uri);
-            using (var rastream = await file.OpenReadAsync())
-            using (var appManifestStream = rastream.AsStreamForRead())
+            var uri = new System.Uri( "ms-appx:///AppxManifest.xml" );
+            StorageFile file = await StorageFile.GetFileFromApplicationUriAsync( uri );
+            using( var rastream = await file.OpenReadAsync() )
+            using( var appManifestStream = rastream.AsStreamForRead() )
             {
-                using (var reader = XmlReader.Create(appManifestStream, new XmlReaderSettings { IgnoreWhitespace = true, IgnoreComments = true }))
+                using( var reader = XmlReader.Create( appManifestStream, new XmlReaderSettings { IgnoreWhitespace = true, IgnoreComments = true } ) )
                 {
-                    var doc = XDocument.Load(reader);
-                    var app = doc.Descendants(doc.Root.Name.Namespace + "Identity").FirstOrDefault();
-                    if (app != null)
+                    var doc = XDocument.Load( reader );
+                    var app = doc.Descendants( doc.Root.Name.Namespace + "Identity" ).FirstOrDefault();
+                    if( app != null )
                     {
-                        var versionAttribute = app.Attribute("Version");
-                        if (versionAttribute != null)
+                        var versionAttribute = app.Attribute( "Version" );
+                        if( versionAttribute != null )
                         {
                             version = versionAttribute.Value;
                         }

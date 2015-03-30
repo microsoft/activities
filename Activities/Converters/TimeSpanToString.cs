@@ -38,10 +38,10 @@ namespace ActivitiesExample.Converters
         /// <param name="parameter">An optional parameter to be used in the converter logic.</param>
         /// <param name="language">The language of the conversion.</param>
         /// <returns>The value to be passed to the target dependency property.</returns>
-        public object Convert(object value, Type targetType, object parameter, string language)
+        public object Convert( object value, Type targetType, object parameter, string language )
         {
-           string result = "(" + ((TimeSpan)value).ToString(@"hh\:mm") + ")";
-           return result;
+            string result = "(" + ( (TimeSpan)value ).ToString( @"hh\:mm" ) + ")";
+            return result;
         }
 
         /// <summary>
@@ -52,7 +52,7 @@ namespace ActivitiesExample.Converters
         /// <param name="parameter">An optional parameter to be used in the converter logic.</param>
         /// <param name="language">The language of the conversion.</param>
         /// <returns>The value to be passed to the target dependency property.</returns>
-        public object ConvertBack(object value, Type targetType, object parameter, string language)
+        public object ConvertBack( object value, Type targetType, object parameter, string language )
         {
             string result = "";
             return result;

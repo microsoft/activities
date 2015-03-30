@@ -38,12 +38,9 @@ namespace ActivitiesExample.Converters
         /// <param name="parameter">An optional parameter to be used in the converter logic.</param>
         /// <param name="language">The language of the conversion.</param>
         /// <returns>The value to be passed to the target dependency property.</returns>
-        public object Convert(object value, Type targetType, object parameter, string language)
+        public object Convert( object value, Type targetType, object parameter, string language )
         {
-            // 320 is an ugly hardcoded value for list width (350) - elipsis column (30)
-            // would be nice if could be suplied as 'parameter' via a binding to list's ActualWidth
-            // but ConverterParameter is non-bindable :(
-            return (320 * ((TimeSpan)value).TotalMinutes) / (12*60);
+            return ( 375 * ( (TimeSpan)value ).TotalMinutes ) / ( 12 * 60 );
         }
 
         /// <summary>
@@ -54,7 +51,7 @@ namespace ActivitiesExample.Converters
         /// <param name="parameter">An optional parameter to be used in the converter logic.</param>
         /// <param name="language">The language of the conversion.</param>
         /// <returns>The value to be passed to the target dependency property.</returns>
-        public object ConvertBack(object value, Type targetType, object parameter, string language)
+        public object ConvertBack( object value, Type targetType, object parameter, string language )
         {
             string result = "";
             return result;

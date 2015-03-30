@@ -27,56 +27,57 @@ using Windows.UI.Xaml.Data;
 namespace ActivitiesExample.Converters
 {
     /// <summary>
-    /// Helper class to convert time window to string
+    /// Helper class to convert date to display string
     /// </summary>
-    class TimeWindowToString : IValueConverter
+    class DateToString : IValueConverter
     {
         #region Private members
         /// <summary>
-        /// Constructs a new ResourceLoader object
+        /// Resource loader
         /// </summary>
-        private readonly ResourceLoader _resourceLoader = ResourceLoader.GetForCurrentView("Resources");
+        private readonly ResourceLoader _resourceLoader = ResourceLoader.GetForCurrentView( "Resources" );
         #endregion
 
         /// <summary>
-        /// Convert activity time window to string
+        /// Converts date to string
         /// </summary>
         /// <param name="value">The source data being passed to the target.</param>
         /// <param name="targetType">The type of the target property, as a type reference </param>
         /// <param name="parameter">An optional parameter to be used in the converter logic.</param>
         /// <param name="language">The language of the conversion.</param>
         /// <returns>The value to be passed to the target dependency property.</returns>
-        public object Convert(object value, Type targetType, object parameter, string language)
+        public object Convert( object value, Type targetType, object parameter, string language )
         {
             string twString = "";
-            if ((double)value == 0)
+            if( (DateTime)value >= DateTime.Today )
             {
-                twString = this._resourceLoader.GetString("TimeWindow/Today");
+                twString = this._resourceLoader.GetString( "TimeWindow/Today" );
             }
-            else if ((double)value == -1)
+            else if( (DateTime)value >= (DateTime.Today - TimeSpan.FromDays( 1) ) )
             {
-                twString = this._resourceLoader.GetString("TimeWindow/Yesterday");
+                twString = this._resourceLoader.GetString( "TimeWindow/Yesterday" );
             }
             else
             {
-                var sdatefmt = new Windows.Globalization.DateTimeFormatting.DateTimeFormatter("shortdate");
-                twString = sdatefmt.Format(DateTime.Now.Date.AddDays((double)value));
+                var sdatefmt = new Windows.Globalization.DateTimeFormatting.DateTimeFormatter( "shortdate" );
+                twString = sdatefmt.Format( (DateTime)value );
             }
             return twString;
         }
 
         /// <summary>
-        /// Remove time window string
+        /// Convert string to time window offset
         /// </summary>
         /// <param name="value">The source data being passed to the target.</param>
         /// <param name="targetType">The type of the target property, as a type reference </param>
         /// <param name="parameter">An optional parameter to be used in the converter logic.</param>
         /// <param name="language">The language of the conversion.</param>
         /// <returns>The value to be passed to the target dependency property.</returns>
-        public object ConvertBack(object value, Type targetType, object parameter, string language)
+        public object ConvertBack( object value, Type targetType, object parameter, string language )
         {
-            string result = "";
-            return result;
+            throw new NotSupportedException();
         }
     }
 }
+
+// end of file

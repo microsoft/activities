@@ -26,12 +26,9 @@ using Windows.ApplicationModel.Activation;
 using Windows.Phone.UI.Input;
 using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
+using Windows.UI.Xaml.Media.Animation;
 using Windows.UI.Xaml.Navigation;
-using ActivitiesExample.ActivateSensorCore;
 
-/// <summary>
-/// The Basic Page item template is documented at http://go.microsoft.com/fwlink/?LinkID=390556
-/// </summary>
 namespace ActivitiesExample
 {
     /// <summary>
@@ -39,27 +36,17 @@ namespace ActivitiesExample
     /// </summary>
     sealed partial class App : Application
     {
-        #region Private members
         /// <summary>
-        /// Status of SensorCore
+        /// Transition collection
         /// </summary>
-        private ActivateSensorCoreStatus _sensorCoreActivationStatus = new ActivateSensorCoreStatus();
-        #endregion
+        private TransitionCollection transitions;
 
         /// <summary>
-        /// Gets or sets the status of SensorCore
+        /// This event wraps HardwareButtons.BackPressed to allow other pages to override
+        /// the default behavior by subscribing to this event and potentially
+        /// handling the back button press a different way (e.g. dismissing dialogs).
         /// </summary>
-        public ActivateSensorCoreStatus SensorCoreActivationStatus
-        {
-            get
-            {
-                return _sensorCoreActivationStatus;
-            }
-            private set
-            {
-                _sensorCoreActivationStatus = value;
-            }
-        }
+        public event EventHandler<BackPressedEventArgs> BackPressed;
 
         /// <summary>
         /// Initializes the singleton application object.  This is the first line of authored code
@@ -69,27 +56,7 @@ namespace ActivitiesExample
         {
             this.InitializeComponent();
             this.Suspending += OnSuspending;
-            HardwareButtons.BackPressed += HardwareButtons_BackPressed;
-        }
-
-        /// <summary>
-        /// Handles back button press.  If app is at the root page of app, don't go back and the
-        /// system will suspend the app.
-        /// </summary>
-        /// <param name="sender">The source of the BackPressed event.</param>
-        /// <param name="e">Details for the BackPressed event.</param>
-        private void HardwareButtons_BackPressed(object sender, BackPressedEventArgs e)
-        {
-            Frame frame = Window.Current.Content as Frame;
-            if (frame == null)
-            {
-                return;
-            }
-            if (frame.CanGoBack)
-            {
-                frame.GoBack();
-                e.Handled = true;
-            }
+            HardwareButtons.BackPressed += this.HardwareButtons_BackPressed;
         }
 
         /// <summary>
@@ -98,50 +65,94 @@ namespace ActivitiesExample
         /// search results, and so forth.
         /// </summary>
         /// <param name="e">Details about the launch request and process.</param>
-        protected override void OnLaunched(LaunchActivatedEventArgs e)
+        protected override void OnLaunched( LaunchActivatedEventArgs e )
         {
 #if DEBUG
-            if (System.Diagnostics.Debugger.IsAttached)
+            if( System.Diagnostics.Debugger.IsAttached )
             {
                 this.DebugSettings.EnableFrameRateCounter = true;
             }
 #endif
             Frame rootFrame = Window.Current.Content as Frame;
+
             // Do not repeat app initialization when the Window already has content,
             // just ensure that the window is active
-            if (rootFrame == null)
+            if( rootFrame == null )
             {
                 // Create a Frame to act as the navigation context and navigate to the first page
                 rootFrame = new Frame();
-                // Set the default language
-                rootFrame.Language = Windows.Globalization.ApplicationLanguages.Languages[0];
-                rootFrame.NavigationFailed += OnNavigationFailed;
-                if (e.PreviousExecutionState == ApplicationExecutionState.Terminated)
+                rootFrame.CacheSize = 1;
+
+                if( e.PreviousExecutionState == ApplicationExecutionState.Terminated )
                 {
-                    //Load state from previously suspended application
                 }
+
                 // Place the frame in the current Window
                 Window.Current.Content = rootFrame;
             }
-            if (rootFrame.Content == null)
+
+            if( rootFrame.Content == null )
             {
+                // Removes the turnstile navigation for startup.
+                if( rootFrame.ContentTransitions != null )
+                {
+                    this.transitions = new TransitionCollection();
+                    foreach( var c in rootFrame.ContentTransitions )
+                    {
+                        this.transitions.Add( c );
+                    }
+                }
+
+                rootFrame.ContentTransitions = null;
+                rootFrame.Navigated += this.RootFrame_FirstNavigated;
+
                 // When the navigation stack isn't restored navigate to the first page,
                 // configuring the new page by passing required information as a navigation
                 // parameter
-                rootFrame.Navigate(typeof(MainPage), e.Arguments);
+                if( !rootFrame.Navigate( typeof( MainPage ), e.Arguments ) )
+                {
+                    throw new Exception( "Failed to create initial page" );
+                }
             }
+
             // Ensure the current window is active
             Window.Current.Activate();
         }
 
         /// <summary>
-        /// Invoked when Navigation to a certain page fails.
+        /// Handles the back button press and navigates through the history of the root frame.
         /// </summary>
-        /// <param name="sender">The Frame which failed navigation.</param>
-        /// <param name="e">Details about the navigation failure.</param>
-        private void OnNavigationFailed(object sender, NavigationFailedEventArgs e)
+        /// <param name="sender">The source of the event. <see cref="HardwareButtons"/></param>
+        /// <param name="e">Details about the back button press.</param>
+        private void HardwareButtons_BackPressed( object sender, BackPressedEventArgs e )
         {
-            throw new Exception("Failed to load Page " + e.SourcePageType.FullName);
+            Frame frame = Window.Current.Content as Frame;
+            if( frame == null )
+            {
+                return;
+            }
+            var handler = this.BackPressed;
+            if( handler != null )
+            {
+                handler( sender, e );
+            }
+            if( frame.CanGoBack && !e.Handled )
+            {
+                frame.GoBack();
+                e.Handled = true;
+            }
+        }
+
+        /// <summary>
+        /// Restores the content transitions after the app has launched.
+        /// </summary>
+        /// <param name="sender">The object where the handler is attached.</param>
+        /// <param name="e">Details about the navigation event.</param>
+        private void RootFrame_FirstNavigated( object sender, NavigationEventArgs e )
+        {
+            var rootFrame = sender as Frame;
+            rootFrame.ContentTransitions = this.transitions ?? new TransitionCollection() { new NavigationThemeTransition() };
+            rootFrame.Navigated -= this.RootFrame_FirstNavigated;
         }
 
         /// <summary>
@@ -151,7 +162,7 @@ namespace ActivitiesExample
         /// </summary>
         /// <param name="sender">The source of the suspend request.</param>
         /// <param name="e">Details about the suspend request.</param>
-        private void OnSuspending(object sender, SuspendingEventArgs e)
+        private void OnSuspending( object sender, SuspendingEventArgs e )
         {
             var deferral = e.SuspendingOperation.GetDeferral();
             //Save application state and stop any background activity

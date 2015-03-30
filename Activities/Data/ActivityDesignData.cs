@@ -1,4 +1,5 @@
-﻿/*	
+﻿using Lumia.Sense;
+/*	
 The MIT License (MIT)
 Copyright (c) 2015 Microsoft
 
@@ -30,23 +31,18 @@ namespace ActivitiesExample.Data
     /// <summary>
     /// Data class for design mode
     /// </summary>
-    public class MyDesignData : INotifyPropertyChanged
+    public class ActivityDesignData : INotifyPropertyChanged
     {
         #region Private members
         /// <summary>
         /// List of activities and durations
         /// </summary>
-        private List<MyQuantifiedData> _listData = null;
+        private List<ActivityDuration> _listData = null;
 
         /// <summary>
-        /// Design data instance
+        /// Singleton instance
         /// </summary>
-        private static MyDesignData _selfData;
-
-        /// <summary>
-        /// Time window index, 0 = today, -1 = yesterday 
-        /// </summary>  
-        private double _timeWindowIndex = 0;
+        private static ActivityDesignData _selfData;
         #endregion
 
         /// <summary>
@@ -59,31 +55,31 @@ namespace ActivitiesExample.Data
         /// The CallerMemberName attribute that is applied to the optional propertyName 
         /// parameter causes the property name of the caller to be substituted as an argument
         /// </summary>
-        /// <param name="propertyName"></param>
-        private void NotifyPropertyChanged([CallerMemberName] String propertyName = "")
+        /// <param name="propertyName">Name of the property</param>
+        private void NotifyPropertyChanged( [CallerMemberName] String propertyName = "" )
         {
-            if (PropertyChanged != null)
+            if( PropertyChanged != null )
             {
-                PropertyChanged(this, new PropertyChangedEventArgs(propertyName));
+                PropertyChanged( this, new PropertyChangedEventArgs( propertyName ) );
             }
         }
 
         /// <summary>
         /// Constructor
         /// </summary>
-        public MyDesignData()
+        public ActivityDesignData()
         {
-            _listData = new List<MyQuantifiedData>();
-            if (Windows.ApplicationModel.DesignMode.DesignModeEnabled)
+            _listData = new List<ActivityDuration>();
+            if( Windows.ApplicationModel.DesignMode.DesignModeEnabled )
             {
-                _listData.Add(new MyQuantifiedData("Idle", new TimeSpan(13, 0, 0)));
-                _listData.Add(new MyQuantifiedData("Moving", new TimeSpan(4, 0, 0)));
-                _listData.Add(new MyQuantifiedData("Stationary", new TimeSpan(1, 0, 0)));
-                _listData.Add(new MyQuantifiedData("Walking", new TimeSpan(2, 0, 0)));
-                _listData.Add(new MyQuantifiedData("Running", new TimeSpan(3, 0, 0)));
-                _listData.Add(new MyQuantifiedData("Biking", new TimeSpan(5, 0, 0)));
-                _listData.Add(new MyQuantifiedData("Moving in vehicle", new TimeSpan(1, 0, 0)));
-                _listData.Add(new MyQuantifiedData("Unknwon", new TimeSpan(1, 0, 0)));
+                _listData.Add( new ActivityDuration( Activity.Idle, TimeSpan.FromHours( 13 ) ) );
+                _listData.Add( new ActivityDuration( Activity.Moving, TimeSpan.FromHours( 4 ) ) );
+                _listData.Add( new ActivityDuration( Activity.Stationary, TimeSpan.FromHours( 1 ) ) );
+                _listData.Add( new ActivityDuration( Activity.Walking, TimeSpan.FromHours( 2 ) ) );
+                _listData.Add( new ActivityDuration( Activity.Running, TimeSpan.FromHours( 3 ) ) );
+                _listData.Add( new ActivityDuration( Activity.Biking, TimeSpan.FromHours( 5 ) ) );
+                _listData.Add( new ActivityDuration( Activity.MovingInVehicle, TimeSpan.FromHours( 1 ) ) );
+                _listData.Add( new ActivityDuration( Activity.Unknown, TimeSpan.FromHours( 1 ) ) );
             }
         }
 
@@ -91,28 +87,30 @@ namespace ActivitiesExample.Data
         /// Create new instance of the class
         /// </summary>
         /// <returns>Design data instance</returns>
-        static public MyDesignData Instance()
+        static public ActivityDesignData Instance()
         {
-            if (_selfData == null)
-                _selfData = new MyDesignData();
+            if( _selfData == null )
+            {
+                _selfData = new ActivityDesignData();
+            }
             return _selfData;
         }
 
         /// <summary>
         /// Get the current activity
         /// </summary>
-        public string CurrentActivity
+        public Activity CurrentActivity
         {
             get
             {
-                return "walking";
+                return Activity.Walking;
             }
         }
 
         /// <summary>
         /// Get the list of activities and durations 
         /// </summary>
-        public List<MyQuantifiedData> ListData
+        public List<ActivityDuration> History
         {
             get
             {
@@ -121,14 +119,13 @@ namespace ActivitiesExample.Data
         }
 
         /// <summary>
-        /// Get the time window
+        /// Date of the data
         /// </summary>
-        public double TimeWindow
+        public DateTime Date 
         {
-            get
-            {
-                return _timeWindowIndex;
-            }
+            get { return DateTime.Today; } 
         }
     }
 }
+
+// end of file

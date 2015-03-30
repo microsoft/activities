@@ -38,9 +38,9 @@ namespace ActivitiesExample.Converters
         /// <param name="parameter">An optional parameter to be used in the converter logic.</param>
         /// <param name="language">The language of the conversion.</param>
         /// <returns>The value to be passed to the target dependency property.</returns>
-        public object Convert(object value, Type targetType, object parameter, string language)
+        public object Convert( object value, Type targetType, object parameter, string language )
         {
-            Uri uri = new Uri("ms-appx:///Assets/Activities/" + ((string)value).ToLower() + ".png", UriKind.Absolute);
+            Uri uri = new Uri( "ms-appx:///Assets/Activities/" + ( value.ToString() ).ToLower() + ".png", UriKind.Absolute );
             return uri;
         }
 
@@ -52,7 +52,7 @@ namespace ActivitiesExample.Converters
         /// <param name="parameter">An optional parameter to be used in the converter logic.</param>
         /// <param name="language">The language of the conversion.</param>
         /// <returns>The value to be passed to the target dependency property.</returns>
-        public object ConvertBack(object value, Type targetType, object parameter, string language)
+        public object ConvertBack( object value, Type targetType, object parameter, string language )
         {
             string result = "";
             return result;

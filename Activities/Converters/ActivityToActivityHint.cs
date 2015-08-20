@@ -54,30 +54,30 @@ namespace ActivitiesExample.Converters
         public object Convert( object value, Type targetType, object parameter, string language )
         {
             string hint = "";
-            switch( (Activity)value )
+            switch(value.ToString().ToLower())
             {
-                case Activity.Moving:
+                case "moving":
                     hint = this._resourceLoader.GetString( "Hint/Moving" );
                     break;
-                case Activity.Idle:
+                case "idle":
                     hint = this._resourceLoader.GetString( "Hint/Idle" );
                     break;
-                case Activity.Stationary:
+                case "stationary":
                     hint = this._resourceLoader.GetString( "Hint/Stationary" );
                     break;
-                case Activity.Walking:
+                case "walking":
                     hint = this._resourceLoader.GetString( "Hint/Walking" );
                     break;
-                case Activity.Running:
+                case "running":
                     hint = this._resourceLoader.GetString( "Hint/Running" );
                     break;
-                case Activity.Biking:
+                case "biking":
                     hint = this._resourceLoader.GetString( "Hint/Biking" );
                     break;
-                case Activity.MovingInVehicle:
+                case "invehicle":
                     hint = this._resourceLoader.GetString( "Hint/MovingInVehicle" );
                     break;
-                case Activity.Unknown:
+                case "unknown":
                     hint = this._resourceLoader.GetString( "Hint/Unknown" );
                     break;
                 default:

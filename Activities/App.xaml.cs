@@ -42,13 +42,6 @@ namespace ActivitiesExample
         private TransitionCollection transitions;
 
         /// <summary>
-        /// This event wraps HardwareButtons.BackPressed to allow other pages to override
-        /// the default behavior by subscribing to this event and potentially
-        /// handling the back button press a different way (e.g. dismissing dialogs).
-        /// </summary>
-        public event EventHandler<BackPressedEventArgs> BackPressed;
-
-        /// <summary>
         /// Initializes the singleton application object.  This is the first line of authored code
         /// executed, and as such is the logical equivalent of main() or WinMain().
         /// </summary>
@@ -56,7 +49,6 @@ namespace ActivitiesExample
         {
             this.InitializeComponent();
             this.Suspending += OnSuspending;
-            HardwareButtons.BackPressed += this.HardwareButtons_BackPressed;
         }
 
         /// <summary>
@@ -124,19 +116,14 @@ namespace ActivitiesExample
         /// </summary>
         /// <param name="sender">The source of the event. <see cref="HardwareButtons"/></param>
         /// <param name="e">Details about the back button press.</param>
-        private void HardwareButtons_BackPressed( object sender, BackPressedEventArgs e )
+        private void HardwareButtons_BackPressed( object sender, Windows.UI.Core.BackRequestedEventArgs e )
         {
             Frame frame = Window.Current.Content as Frame;
             if( frame == null )
             {
                 return;
             }
-            var handler = this.BackPressed;
-            if( handler != null )
-            {
-                handler( sender, e );
-            }
-            if( frame.CanGoBack && !e.Handled )
+            if( frame.CanGoBack)
             {
                 frame.GoBack();
                 e.Handled = true;
@@ -153,6 +140,7 @@ namespace ActivitiesExample
             var rootFrame = sender as Frame;
             rootFrame.ContentTransitions = this.transitions ?? new TransitionCollection() { new NavigationThemeTransition() };
             rootFrame.Navigated -= this.RootFrame_FirstNavigated;
+            Windows.UI.Core.SystemNavigationManager.GetForCurrentView().BackRequested += HardwareButtons_BackPressed;
         }
 
         /// <summary>

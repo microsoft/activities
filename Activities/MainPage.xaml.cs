@@ -20,19 +20,16 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE. 
  */
+using Lumia.Sense;
 using System;
+using System.Diagnostics;
+using System.Threading.Tasks;
+using Windows.ApplicationModel.Resources;
 using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
 using Windows.UI.Xaml.Navigation;
 using Windows.UI.Core;
 using Windows.UI.Popups;
-using System.Threading.Tasks;
-using Lumia.Sense;
-using System.Diagnostics;
-using ActivitiesExample.Data;
-using Windows.Security.ExchangeActiveSyncProvisioning;
-using Windows.ApplicationModel.Resources;
-using System.Collections.Generic;
 
 namespace ActivitiesExample
 {
@@ -43,14 +40,9 @@ namespace ActivitiesExample
     {
         #region Private members
         /// <summary>
-        /// Activity monitor instance
-        /// </summary>
-        private IActivityMonitor _activityMonitor = null;
-
-        /// <summary>
-        /// Check if running in emulator
-        /// </summary>
-        private bool _runningInEmulator = false;
+        /// Activity Sensor instance
+        /// </summary>        
+        private ActivitySensorInstance _sensor = null;
 
         /// <summary>
         /// Constructs a new ResourceLoader object
@@ -70,15 +62,6 @@ namespace ActivitiesExample
         {
             InitializeComponent();
             this.NavigationCacheMode = NavigationCacheMode.Required;
-            DataContext = ActivityData.Instance();
-
-            // Using this method to detect if the application runs in the emulator or on a real device. Later the *Simulator API is used to read fake sense data on emulator. 
-            // In production code you do not need this and in fact you should ensure that you do not include the Lumia.Sense.Test reference in your project.
-            EasClientDeviceInformation x = new EasClientDeviceInformation();
-            if( x.SystemProductName.StartsWith( "Virtual" ) )
-            {
-                _runningInEmulator = true;
-            }
 
             Window.Current.VisibilityChanged += async ( sender, args ) =>
             {
@@ -86,31 +69,31 @@ namespace ActivitiesExample
                 {
                     if( !args.Visible )
                     {
-                        // Application put to background, deactivate sensor and unregister change observer
-                        if( _activityMonitor != null )
+                        // Application put to background, deactivate sensor
+                        if(_sensor != null)
                         {
-                            _activityMonitor.Enabled = true;
-                            _activityMonitor.ReadingChanged -= activityMonitor_ReadingChanged;
-                            await _activityMonitor.DeactivateAsync();
+                            await _sensor.DeactivateAsync();
                         }
                     }
                     else
                     {
-                        // Make sure all necessary settings are enabled in order to run SensorCore
-                        await ValidateSettingsAsync();
-                        // Make sure sensor is activated
-                        if( _activityMonitor == null )
+                        // Create sensor instance if already not created
+                        if (_sensor == null)
                         {
-                            await InitializeSensorAsync();
-                        }
-                        else
-                        {
-                            await _activityMonitor.ActivateAsync();
+                            _sensor = await ActivitySensorInstance.GetInstance();
+
+                            // Bind data
+                            DataContext = _sensor.GetActivityDataInstance();
                         }
 
-                        // Enable change observer
-                        _activityMonitor.ReadingChanged += activityMonitor_ReadingChanged;
-                        _activityMonitor.Enabled = true;
+                        // Check if all the required settings have been configured correctly
+                        await _sensor.ValidateSettingsAsync();
+
+                        // Register delegate to get reading changes
+                        _sensor.ReadingChanged += activity_ReadingChanged;
+
+                        // Activate the sensor
+                        await _sensor.ActivateAsync();
 
                         // Update screen
                         await UpdateSummaryAsync();
@@ -125,74 +108,8 @@ namespace ActivitiesExample
         /// <returns>Asynchronous task</returns>
         private async Task InitializeSensorAsync()
         {
-            if( _runningInEmulator )
-            {
-                //                await CallSensorCoreApiAsync( async () => { _activityMonitor = await ActivityMonitorSimulator.GetDefaultAsync(); } );
-            }
-            else
-            {
-                await CallSensorCoreApiAsync( async () => { _activityMonitor = await ActivityMonitor.GetDefaultAsync(); } );
-            }
-            if( _activityMonitor == null )
-            {
-                // Nothing to do if we cannot use the API
-                Application.Current.Exit();
-            }
-        }
-
-        /// <summary>
-        /// Makes sure necessary settings are enabled in order to use SensorCore
-        /// </summary>
-        /// <returns>Asynchronous task</returns>
-        private async Task ValidateSettingsAsync()
-        {
-            if( !( await ActivityMonitor.IsSupportedAsync() ) )
-            {
-                MessageDialog dlg = new MessageDialog( this._resourceLoader.GetString( "FeatureNotSupported/Message" ), this._resourceLoader.GetString( "FeatureNotSupported/Title" ) );
-                await dlg.ShowAsync();
-                Application.Current.Exit();
-            }
-            else
-            {
-                uint apiSet = await SenseHelper.GetSupportedApiSetAsync();
-                MotionDataSettings settings = await SenseHelper.GetSettingsAsync();
-                if( settings.Version < 2 )
-                {
-                    // Device which has old Motion data settings which requires system location and Motion data be enabled in order to access
-                    // ActivityMonitor.
-                    if( !settings.LocationEnabled )
-                    {
-                        MessageDialog dlg = new MessageDialog( "In order to recognize activities you need to enable location in system settings. Do you want to open settings now? If not, application will exit.", "Information" );
-                        dlg.Commands.Add( new UICommand( "Yes", new UICommandInvokedHandler( async ( cmd ) => await SenseHelper.LaunchLocationSettingsAsync() ) ) );
-                        dlg.Commands.Add( new UICommand( "No", new UICommandInvokedHandler( ( cmd ) => { Application.Current.Exit(); } ) ) );
-                        await dlg.ShowAsync();
-                    }
-                    else if( !settings.PlacesVisited )
-                    {
-                        MessageDialog dlg = new MessageDialog( "In order to recognize activities you need to enable Motion data in Motion data settings. Do you want to open settings now? If not, application will exit.", "Information" );
-                        dlg.Commands.Add( new UICommand( "Yes", new UICommandInvokedHandler( async ( cmd ) => await SenseHelper.LaunchSenseSettingsAsync() ) ) );
-                        dlg.Commands.Add( new UICommand( "No", new UICommandInvokedHandler( ( cmd ) => { Application.Current.Exit(); } ) ) );
-                        await dlg.ShowAsync();
-                    }
-                }
-                else if( apiSet >= 3 )
-                {
-                    if( !settings.LocationEnabled )
-                    {
-                        MessageDialog dlg = new MessageDialog( "In order to recognize biking you need to enable location in system settings. Do you want to open settings now?", "Helpful tip" );
-                        dlg.Commands.Add( new UICommand( "Yes", new UICommandInvokedHandler( async ( cmd ) => await SenseHelper.LaunchLocationSettingsAsync() ) ) );
-                        dlg.Commands.Add( new UICommand( "No" ) );
-                        await dlg.ShowAsync();
-                    }
-                    else if( settings.DataQuality == DataCollectionQuality.Basic )
-                    {
-                        MessageDialog dlg = new MessageDialog( "In order to recognize biking you need to enable detailed data collection in Motion data settings. Do you want to open settings now?", "Helpful tip" );
-                        dlg.Commands.Add( new UICommand( "Yes", new UICommandInvokedHandler( async ( cmd ) => await SenseHelper.LaunchSenseSettingsAsync() ) ) );
-                        dlg.Commands.Add( new UICommand( "No" ) );
-                        await dlg.ShowAsync();
-                    }
-                }
-            }
+            // Initialize sensor core
+            await _sensor.InitializeSensorCoreAsync();
         }
 
         /// <summary>
@@ -262,21 +179,18 @@ namespace ActivitiesExample
         {
             if( e.NavigationMode == NavigationMode.Back )
             {
-                // Make sure all necessary settings are enabled in order to run SensorCore
-                await ValidateSettingsAsync();
-                // Make sure sensor is activated
-                if( _activityMonitor == null )
+                // Make sure all necessary settings are enabled
+                await _sensor.ValidateSettingsAsync();
+
+                // Register for reading change notifications if we have already not registered.
+                if(_sensor.ReadingChanged == null)
                 {
-                    await InitializeSensorAsync();
-                }
-                else
-                {
-                    await _activityMonitor.ActivateAsync();
+                    _sensor.ReadingChanged += activity_ReadingChanged;
                 }
 
-                // Register change observer
-                _activityMonitor.ReadingChanged += activityMonitor_ReadingChanged;
-                _activityMonitor.Enabled = true;
+                // Activate the sensor
+                await _sensor.ActivateAsync();
+
                 // Update screen
                 await UpdateSummaryAsync();
             }
@@ -288,11 +202,12 @@ namespace ActivitiesExample
         /// <param name="e">Event arguments</param>
         protected async override void OnNavigatedFrom( NavigationEventArgs e )
         {
-            if( _activityMonitor != null )
+            if(_sensor != null )
             {
-                _activityMonitor.Enabled = false;
-                _activityMonitor.ReadingChanged -= activityMonitor_ReadingChanged;
-                await _activityMonitor.DeactivateAsync();
+                // Unregister from reading change notifications
+                _sensor.ReadingChanged -= activity_ReadingChanged;
+                // Deactivate sensor
+                await _sensor.DeactivateAsync();
             }
         }
 
@@ -301,12 +216,14 @@ namespace ActivitiesExample
         /// </summary>
         /// <param name="sender">Sender object</param>
         /// <param name="args">Event arguments</param>
-        private async void activityMonitor_ReadingChanged( IActivityMonitor sender, ActivityMonitorReading args )
+        private async void activity_ReadingChanged(object sender, object args)
         {
-            await this.Dispatcher.RunAsync( CoreDispatcherPriority.Normal, () =>
+            await this.Dispatcher.RunAsync(CoreDispatcherPriority.Normal, () =>
             {
-                ActivityData.Instance().CurrentActivity = args.Mode;
-            } );
+                // Call into the actual sensor implementationt to update data
+                // source.
+                ((ActivitySensorInstance)sender).UpdateCurrentActivity(args);
+            });
         }
 
         /// <summary>
@@ -315,64 +232,13 @@ namespace ActivitiesExample
         /// <returns>Asynchronous task</returns>
         private async Task UpdateSummaryAsync()
         {
-            if( _activityMonitor != null )
+            if ( _sensor != null )
             {
                 if( !await CallSensorCoreApiAsync( async () =>
                 {
-                    // Read current activity
-                    ActivityMonitorReading reading = await _activityMonitor.GetCurrentReadingAsync();
-                    if( reading != null )
-                    {
-                        ActivityData.Instance().CurrentActivity = reading.Mode;
-                    }
-
-                    // Fetch activity history for the day
-                    DateTime startDate = DateTime.Today.Subtract( TimeSpan.FromDays( _dayOffset ) );
-                    DateTime endDate = startDate + TimeSpan.FromDays( 1 );
-                    var history = await _activityMonitor.GetActivityHistoryAsync( startDate, TimeSpan.FromDays( 1 ) );
-                    Dictionary<Activity, TimeSpan> activitySummary = new Dictionary<Activity, TimeSpan>();
-                    var activityTypes = Enum.GetValues( typeof( Activity ) );
-                    foreach( var type in activityTypes )
-                    {
-                        activitySummary[ (Activity)type ] = TimeSpan.Zero;
-                    }
-                    if( history.Count > 0 )
-                    {
-                        Activity currentActivity = history[ 0 ].Mode;
-                        DateTime currentDate = history[ 0 ].Timestamp.DateTime;
-                        foreach( var item in history )
-                        {
-                            if( item.Timestamp >= startDate )
-                            {
-                                TimeSpan duration = TimeSpan.Zero;
-                                if( currentDate < startDate )
-                                {
-                                    // If first activity of the day started already yesterday, set start time to midnight.
-                                    currentDate = startDate;
-                                }
-                                if( item.Timestamp > endDate )
-                                {
-                                    // If last activity extends over to next day, set end time to midnight.
-                                    duration = endDate - currentDate;
-                                    break;
-                                }
-                                else
-                                {
-                                    duration = item.Timestamp - currentDate;
-                                }
-                                activitySummary[ currentActivity ] += duration;
-                            }
-                            currentActivity = item.Mode;
-                            currentDate = item.Timestamp.DateTime;
-                        }
-                    }
-                    List<ActivityDuration> historyList = new List<ActivityDuration>();
-                    foreach( var activityType in activityTypes )
-                    {
-                        historyList.Add( new ActivityDuration( (Activity)activityType, activitySummary[ (Activity)activityType ] ) );
-                    }
-                    ActivityData.Instance().History = historyList;
-                    ActivityData.Instance().Date = startDate;
+                    // Call into the actual sensor implementationt to fetch 
+                    // history and update data source
+                    await _sensor.UpdateSummaryAsync(_dayOffset);
                 } ) )
                 {
                     Debug.WriteLine( "Reading the history failed." );
@@ -432,6 +298,26 @@ namespace ActivitiesExample
                 refreshButton.IsEnabled = _dayOffset == 0;
                 await UpdateSummaryAsync();
             }
+        }
+
+        /// <summary>
+        /// Decrease opacity of the command bar when closed
+        /// </summary>
+        /// <param name="sender">The sender of the event</param>
+        /// <param name="e">Event arguments</param>
+        private void CommandBar_Closed(object sender, object e)
+        {
+            cmdBar.Opacity = 0.5;
+        }
+
+        /// <summary>
+        /// Increase opacity of command bar when opened
+        /// </summary>
+        /// <param name="sender">The sender of the event</param>
+        /// <param name="e">Event arguments</param>
+        private void CommandBar_Opened(object sender, object e)
+        {
+            cmdBar.Opacity = 1;
         }
     }
 }

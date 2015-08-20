@@ -179,6 +179,9 @@ The application will now exit.</value>
   <data name="Hint.Biking" xml:space="preserve">
     <value>Biking activity</value>
   </data>
+  <data name="Hint.Fidgeting" xml:space="preserve">
+    <value>User is stationary but is making minor movements</value>
+  </data>
   <data name="Hint.Idle" xml:space="preserve">
     <value>The phone was laying still, for example, on a table.</value>
   </data>

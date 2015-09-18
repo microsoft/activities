@@ -24,6 +24,7 @@ using ActivitiesExample.Data;
 using Lumia.Sense;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Threading.Tasks;
 using Windows.ApplicationModel.Resources;
 using Windows.Devices.Sensors;
@@ -34,50 +35,132 @@ using Windows.UI.Xaml;
 
 namespace ActivitiesExample
 {
+    public delegate void ReadingChangedEventHandler(object sender, object args);
+    /// <summary>
+    /// Platform agnostic Activity Sensor interface.
+    /// </summary>
+    public interface IActivitySensor
+    {
+        /// <summary>
+        /// Initializes the sensor.
+        /// </summary>
+        /// <returns>Asynchronous task</returns>
+        Task InitializeSensorAsync();
+
+        /// <summary>
+        /// Activates the sensor and registers for reading changed notifications.
+        /// </summary>
+        /// <returns>Asynchronous task</returns>
+        Task ActivateAsync();
+
+        /// <summary>
+        /// Deactivates sensor the sensor and registers for reading changed notifications.
+        /// </summary>
+        /// <returns>Asynchronous task</returns>
+        Task DeactivateAsync();
+
+        /// <summary>
+        /// Validates if all the settings and permissions are in place to use the sensor.
+        /// </summary>
+        /// <returns>Asynchronous task</returns>
+        Task ValidateSettingsAsync();
+
+        /// <summary>
+        /// Pull activity entries from history database and populate the internal list.
+        /// </summary>
+        /// <param name="DayOffset">DayOffset from current day</param>
+        /// <returns>Asynchronous task</returns>
+        Task UpdateSummaryAsync(uint DayOffset);
+
+        /// <summary>
+        /// Update current cached activity of the user.
+        /// </summary>
+        /// <param name="args">Current Activity reported by the sensor. Type of this argument is either Windows.Devices.Sensors.ActivityType or Lumia.Sense.Activity</param>
+        void UpdateCurrentActivity(object args);
+
+        /// <summary>
+        /// Get an instance of ActivityData<T>. This is the data source that reflects 
+        /// the history entries that gets displayed in the UI.
+        /// </summary>
+        object GetActivityDataInstance();
+        event ReadingChangedEventHandler ReadingChanged;
+    }
+    
 
     /// <summary>
-    /// Base class that abstracts the mechanics of talking to a sensor instance. 
-    /// Virtual Methods in the base class are wired to talk to Windows.Devices.Sensor.ActivitySensor
+    /// Factory class for instantiating Activity Sensor. If OS Activity Sensor is not available, SensorCore Activity Sensor is used.
     /// </summary>
-    class ActivitySensorInstance
+    public static class ActivitySensorFactory
+    {
+        public static async Task<IActivitySensor> GetDefaultAsync()
+        {
+            IActivitySensor sensor = null;
+            
+            try
+            {
+                ActivitySensor activitySensor = await ActivitySensor.GetDefaultAsync();
+                if (activitySensor != null)
+                {
+                    sensor = new OSActivitySensor(activitySensor);
+                }
+            }
+            catch (System.UnauthorizedAccessException)
+            {
+                MessageDialog dialog = new MessageDialog("Motion access has been disabled in system settings. Do you want to open settings now?", "Information");
+                dialog.Commands.Add(new UICommand("Yes", async cmd => await Windows.System.Launcher.LaunchUriAsync(new Uri("ms-settings:privacy-motion"))));
+                dialog.Commands.Add(new UICommand("No"));
+                await dialog.ShowAsync();
+                new System.Threading.ManualResetEvent(false).WaitOne(500);
+                return null;
+            }
+            
+            if (sensor == null)
+            {
+                sensor = new LumiaActivitySensor();
+            }
+            return sensor;
+        }
+    }
+
+    /// <summary>
+    /// Implementation of IActivitySensor that surfaces Activity Sensor supported by the OS (Windows.Devices.Sensor.ActivitySensor).
+    /// </summary>
+    public class OSActivitySensor : IActivitySensor 
     {
 
         #region Private members
         /// <summary>
-        /// Singleton instance
+        /// Singleton instance.
         /// </summary>
-        protected static ActivitySensorInstance _self;
+        protected static OSActivitySensor _self;
 
         /// <summary>
-        /// Physical sensor
+        /// Physical sensor.
         /// </summary>
         private static Windows.Devices.Sensors.ActivitySensor _sensor = null;
 
         /// <summary>
-        /// Constructs a new ResourceLoader object
+        /// Constructs a new ResourceLoader object.
         /// </summary>
         static protected readonly ResourceLoader _resourceLoader = ResourceLoader.GetForCurrentView("Resources");
 
         /// <summary>
-        /// Check if running in emulator
+        /// Check if running in emulator.
         /// </summary>
         protected bool _runningInEmulator = false;
 
         /// <summary>
-        /// Reading changed delegate signature
+        /// Reading changed handler.
         /// </summary
-        /// <param name="sender">The sender of the event</param>
-        /// <param name="args">Event arguments</param>
-        public delegate void ReadingChangedEventHandler(object sender, object args);
-
-        /// <summary>
-        /// Reading changed handler
-        /// </summary
-        public ReadingChangedEventHandler ReadingChanged = null;
+        public event ReadingChangedEventHandler ReadingChanged = null;
         #endregion
 
-        public ActivitySensorInstance()
+        /// <summary>
+        /// OSActivitySensor constructor.
+        /// </summary
+        public OSActivitySensor(ActivitySensor sensor)
         {
+            _sensor = sensor;
             // Using this method to detect if the application runs in the emulator or on a real device. Later the *Simulator API is used to read fake sense data on emulator. 
             // In production code you do not need this and in fact you should ensure that you do not include the Lumia.Sense.Test reference in your project.
             EasClientDeviceInformation x = new EasClientDeviceInformation();
@@ -88,57 +171,19 @@ namespace ActivitiesExample
         }
 
         /// <summary>
-        /// Create new instance 
-        /// </summary>
-        /// <returns>Data instance</returns>
-        static public async Task<ActivitySensorInstance> GetInstance()
-        {
-            // Create the instance if it is not already created
-            if (_self == null)
-            {
-                try
-                {
-                    // Try to get default Activity Sensor exposed by the operating system
-                    // before trying to use activity sensor from SensorCore SDK
-                    _sensor = await Windows.Devices.Sensors.ActivitySensor.GetDefaultAsync();
-
-                    // If it's not available fall back to sensor core
-                    if (_sensor == null)
-                    {
-                        _self = new LumiaActivitySensor();
-                    }
-                    else
-                    {
-                        _self = new ActivitySensorInstance();
-                    }
-                }
-                catch (System.UnauthorizedAccessException)
-                {
-                    // If motion data is disabled ask the user to enable it
-                    // before falling back to sensor core SDK.
-                    MessageDialog dlg = new MessageDialog("You need to authorize this app to use motion data in system settings.");
-                    await dlg.ShowAsync();
-                    Application.Current.Exit();
-                }
-            }
-
-            return _self;
-        }
-
-        /// <summary>
-        /// Get the singleton instance.
+        /// Get the singleton instance of ActivityData<Windows.Devices.Sensors.ActivityType>.
         /// </summary>
         /// <returns>ActivityData/returns>
-        virtual public object GetActivityDataInstance()
+        public object GetActivityDataInstance()
         {
             return ActivityData<Windows.Devices.Sensors.ActivityType>.Instance();
         }
 
         /// <summary>
-        /// Initialize sensor
+        /// Initialize sensor.
         /// </summary>
         /// <returns>Asynchronous Task</returns>
-        virtual public Task InitializeSensorCoreAsync()
+        public Task InitializeSensorAsync()
         {
             // Subscribe to all supported acitivities
             foreach (ActivityType activity in _sensor.SupportedActivities)
@@ -150,10 +195,10 @@ namespace ActivitiesExample
         }
 
         /// <summary>
-        /// Do nothing
+        /// Do nothing.
         /// </summary>
         /// <returns>Asynchronous task/returns>
-        virtual public Task ValidateSettingsAsync()
+        public Task ValidateSettingsAsync()
         {
             return Task.FromResult(false);
         }
@@ -163,7 +208,7 @@ namespace ActivitiesExample
         /// Windows.Devices.Sensor register reading changed handler.
         /// </summary>
         /// <returns>Asynchronous task/returns>
-        virtual public Task ActivateAsync()
+        public Task ActivateAsync()
         {
             _sensor.ReadingChanged += new TypedEventHandler<ActivitySensor, ActivitySensorReadingChangedEventArgs>(ActivitySensor_ReadingChanged);
             return Task.FromResult(false);
@@ -174,14 +219,14 @@ namespace ActivitiesExample
         /// Windows.Devices.Sensor unregister reading changed handler.
         /// </summary>
         /// <returns>Asynchronous task/returns>
-        virtual public Task DeactivateAsync()
+        public Task DeactivateAsync()
         {
             _sensor.ReadingChanged -= new TypedEventHandler<ActivitySensor, ActivitySensorReadingChangedEventArgs>(ActivitySensor_ReadingChanged);
             return Task.FromResult(false);
         }
 
         /// <summary>
-        /// Update the reading in the screen
+        /// Update the reading in the screen.
         /// </summary>
         /// <returns>Nothing/returns>
         /// <param name="sender">The sender of the event</param>
@@ -200,12 +245,36 @@ namespace ActivitiesExample
         }
 
         /// <summary>
-        /// Updates the summary in the screen
+        /// Returns the activity at the given time
+        /// </summary>
+        /// <param name="sensor">Sensor instance</param>
+        /// <param name="timestamp">Time stamp</param>
+        /// <returns>Activity at the given time or <c>null</c> if no activity is found.</returns>
+        public static async Task<ActivitySensorReading> GetActivityAtAsync(DateTimeOffset timestamp)
+        {
+            // We assume here that one day overshoot is enough to cover most cases. If the previous activity lasted longer
+            // than that, we will miss it. Overshoot duration can be extended but will decrease performance.
+            TimeSpan overshoot = TimeSpan.FromDays(1);
+            IReadOnlyList<ActivitySensorReading> history = await ActivitySensor.GetSystemHistoryAsync(
+                timestamp - overshoot,
+                overshoot);
+            if (history.Count > 0)
+            {
+                return history[history.Count - 1];
+            }
+            else
+            {
+                return null;
+            }
+        }
+
+        /// <summary>
+        /// Updates the summary in the screen.
         /// </summary>
         /// <returns>Asynchronous task/returns>
         /// <param name="DayOffset">Day offset</param>
         /// <returns>Asyncrhonous Task</returns>
-        virtual public async Task UpdateSummaryAsync(uint DayOffset)
+        public async Task UpdateSummaryAsync(uint DayOffset)
         {
             // Read current activity
             ActivitySensorReading reading = await _sensor.GetCurrentReadingAsync();
@@ -217,6 +286,7 @@ namespace ActivitiesExample
             // Fetch activity history for the day
             DateTime startDate = DateTime.Today.Subtract(TimeSpan.FromDays(DayOffset));
             DateTime endDate = startDate + TimeSpan.FromDays(1);
+
             var history = await ActivitySensor.GetSystemHistoryAsync(startDate, TimeSpan.FromDays(1));
 
             // Create a dictionary to store data
@@ -227,6 +297,17 @@ namespace ActivitiesExample
             foreach (var type in activityTypes)
             {
                 activitySummary[(Windows.Devices.Sensors.ActivityType)type] = TimeSpan.Zero;
+            }
+
+            if (history.Count == 0 || history[0].Timestamp > startDate)
+            {
+                ActivitySensorReading currentReading = await GetActivityAtAsync(startDate);
+                if (currentReading != null)
+                {
+                    List<ActivitySensorReading> finalHistory = new List<ActivitySensorReading>(history);
+                    finalHistory.Insert(0, currentReading);
+                    history = finalHistory.AsReadOnly();
+                }
             }
 
             // Update the timespan for all activities in the dictionary
@@ -275,43 +356,124 @@ namespace ActivitiesExample
         }
 
         /// <summary>
-        /// Update the current activity that's displayed
+        /// Update the current activity that's displayed.
         /// </summary>
         /// <param name="args">Event arguments</param>
-        virtual public void UpdateCurrentActivity(object args)
+        public void UpdateCurrentActivity(object args)
         {
             ActivityData<Windows.Devices.Sensors.ActivityType>.Instance().CurrentActivity = (Windows.Devices.Sensors.ActivityType)args;
         }
     };
 
     /// <summary>
-    /// Helper class that is used to talk to Lumia SensorCore ActivityMonitor 
+    /// Implementation of IActivitySensor that surfaces Activity Sensor supported by the SensorCore.
     /// instance. 
     /// </summary>
-    class LumiaActivitySensor : ActivitySensorInstance
+    public class LumiaActivitySensor : IActivitySensor
     {
         #region Private members
         /// <summary>
-        /// Physical sensor
+        /// Physical sensor.
         /// </summary>
         public static Lumia.Sense.ActivityMonitor _activityMonitor = null;
+
+        /// <summary>
+        /// Constructs a new ResourceLoader object.
+        /// </summary>
+        static protected readonly ResourceLoader _resourceLoader = ResourceLoader.GetForCurrentView("Resources");
+
+        /// <summary>
+        /// Check if running in emulator
+        /// </summary>
+        protected bool _runningInEmulator = false;
+
+        /// <summary>
+        /// Reading changed handler.
+        /// </summary
+        public event ReadingChangedEventHandler ReadingChanged = null;
         #endregion
 
+        /// <summary>
+        /// Lumia Activity Sensor constructor.
+        /// </summary
         public LumiaActivitySensor()
         {
 
         }
 
-        public override object GetActivityDataInstance()
+        /// <summary>
+        /// Performs asynchronous Sense SDK operation and handles any exceptions
+        /// </summary>
+        /// <param name="action">The function delegate to execute asynchronously when one task in the tasks completes</param>
+        /// <returns><c>true</c> if call was successful, <c>false</c> otherwis:)
+        /// e</returns>
+        private async Task<bool> CallSensorCoreApiAsync(Func<Task> action)
+        {
+            Exception failure = null;
+            try
+            {
+                await action();
+            }
+            catch (Exception e)
+            {
+                failure = e;
+                Debug.WriteLine("Failure:" + e.Message);
+            }
+            if (failure != null)
+            {
+                try
+                {
+                    MessageDialog dialog = null;
+                    switch (SenseHelper.GetSenseError(failure.HResult))
+                    {
+                        case SenseError.LocationDisabled:
+                            {
+                                dialog = new MessageDialog("In order to recognize activities you need to enable location in system settings. Do you want to open settings now? If not, application will exit.", "Information");
+                                dialog.Commands.Add(new UICommand("Yes", new UICommandInvokedHandler(async (cmd) => await SenseHelper.LaunchLocationSettingsAsync())));
+                                dialog.Commands.Add(new UICommand("No", new UICommandInvokedHandler((cmd) => { Application.Current.Exit(); })));
+                                await dialog.ShowAsync();
+                                new System.Threading.ManualResetEvent(false).WaitOne(500);
+                                return false;
+                            }
+                        case SenseError.SenseDisabled:
+                            {
+                                dialog = new MessageDialog("In order to recognize activities you need to enable Motion data in Motion data settings. Do you want to open settings now? If not, application will exit.", "Information");
+                                dialog.Commands.Add(new UICommand("Yes", new UICommandInvokedHandler(async (cmd) => await SenseHelper.LaunchSenseSettingsAsync())));
+                                dialog.Commands.Add(new UICommand("No", new UICommandInvokedHandler((cmd) => { Application.Current.Exit(); })));
+                                await dialog.ShowAsync();
+                                return false;
+                            }
+                        default:
+                            dialog = new MessageDialog("Failure: " + SenseHelper.GetSenseError(failure.HResult), "");
+                            await dialog.ShowAsync();
+                            return false;
+                    }
+                }
+                catch (Exception ex)
+                {
+                    Debug.WriteLine("Failed to handle failure. Message:" + ex.Message);
+                    return false;
+                }
+            }
+            else
+            {
+                return true;
+            }
+        }
+
+        /// <summary>
+        /// Get singleton instance of ActivityData<Lumia.Sense.Activity>.
+        /// </summary>
+        public object GetActivityDataInstance()
         {
             return ActivityData<Lumia.Sense.Activity>.Instance();
         }
 
         /// <summary>
-        /// Initialize sensor core
+        /// Initialize sensor core.
         /// </summary>
         /// <returns>Asynchronous task/returns>
-        public override async Task InitializeSensorCoreAsync()
+        public async Task InitializeSensorAsync()
         {
             if (_runningInEmulator)
             {
@@ -320,7 +482,10 @@ namespace ActivitiesExample
             else
             {
                 // Get the activity monitor instance
-                _activityMonitor = await ActivityMonitor.GetDefaultAsync();
+                await CallSensorCoreApiAsync(async () =>
+                {
+                    _activityMonitor = await ActivityMonitor.GetDefaultAsync();
+                });
             }
             if (_activityMonitor == null)
             {
@@ -330,10 +495,10 @@ namespace ActivitiesExample
         }
 
         /// <summary>
-        /// Validate if settings have been configured correctly to run SensorCore
+        /// Validate if settings have been configured correctly to run SensorCore.
         /// </summary>
         /// <returns>Asynchronous task/returns>
-        public override async Task ValidateSettingsAsync()
+        public async Task ValidateSettingsAsync()
         {
             if (!(await ActivityMonitor.IsSupportedAsync()))
             {
@@ -385,42 +550,48 @@ namespace ActivitiesExample
         }
 
         /// <summary>
-        /// Activate Sensor Instance
+        /// Activate Sensor Instance.
         /// </summary>
         /// <returns>Asynchronous task/returns>
-        public override async Task ActivateAsync()
+        public async Task ActivateAsync()
         {
             if (_activityMonitor == null)
             {
-                await InitializeSensorCoreAsync();
+                await InitializeSensorAsync();
             }
             else
             {
                 _activityMonitor.Enabled = true;
                 _activityMonitor.ReadingChanged += activityMonitor_ReadingChanged;
 
-                await _activityMonitor.ActivateAsync();
+                await CallSensorCoreApiAsync(async () =>
+                {
+                    await _activityMonitor.ActivateAsync();
+                });
             }
 
         }
 
         /// <summary>
-        /// Deactivate sensor instance
+        /// Deactivate sensor instance.
         /// </summary>
         /// <returns>Asynchronous task/returns>
-        public override async Task DeactivateAsync()
+        public async Task DeactivateAsync()
         {
             if (_activityMonitor != null)
             {
                 _activityMonitor.Enabled = false;
                 _activityMonitor.ReadingChanged -= activityMonitor_ReadingChanged;
-                await _activityMonitor.DeactivateAsync();
+                await CallSensorCoreApiAsync(async () =>
+                {
+                    await _activityMonitor.DeactivateAsync();
+                });
             }
 
         }
 
         /// <summary>
-        /// Called when activity changes
+        /// Called when activity changes.
         /// </summary>
         /// <param name="sender">Sender object</param>
         /// <param name="args">Event arguments</param>
@@ -436,14 +607,20 @@ namespace ActivitiesExample
         }
 
         /// <summary>
-        /// Update Summary
+        /// Update Summary.
         /// </summary>
         /// <returns>Asynchronous task/returns>
         /// <param name="DayOffset">Day Offset</param>
-        public override async Task UpdateSummaryAsync(uint DayOffset)
+        public async Task UpdateSummaryAsync(uint DayOffset)
         {
             // Read current activity
-            ActivityMonitorReading reading = await _activityMonitor.GetCurrentReadingAsync();
+            ActivityMonitorReading reading = null;
+
+            await CallSensorCoreApiAsync(async () =>
+            {
+                await _activityMonitor.GetCurrentReadingAsync();
+            });
+
             if (reading != null)
             {
                 ActivityData<Lumia.Sense.Activity>.Instance().CurrentActivity = reading.Mode;
@@ -452,7 +629,12 @@ namespace ActivitiesExample
             // Fetch activity history for the day
             DateTime startDate = DateTime.Today.Subtract(TimeSpan.FromDays(DayOffset));
             DateTime endDate = startDate + TimeSpan.FromDays(1);
-            var history = await _activityMonitor.GetActivityHistoryAsync(startDate, TimeSpan.FromDays(1));
+            IList<ActivityMonitorReading> history = null;
+
+            await CallSensorCoreApiAsync(async () =>
+            {
+                 history = await _activityMonitor.GetActivityHistoryAsync(startDate, TimeSpan.FromDays(1));
+            });
 
             // Create a dictionary to store data
             Dictionary<Activity, TimeSpan> activitySummary = new Dictionary<Activity, TimeSpan>();
@@ -510,10 +692,10 @@ namespace ActivitiesExample
         }
 
         /// <summary>
-        /// Update Summary
+        /// Update Current Activity that's cached.
         /// </summary>
         /// <param name="args">Current acitivity value</param>
-        public override void UpdateCurrentActivity(object args)
+        public void UpdateCurrentActivity(object args)
         {
             ActivityData<Lumia.Sense.Activity>.Instance().CurrentActivity = (Lumia.Sense.Activity)args;
         }

@@ -304,11 +304,11 @@ namespace ActivitiesExample
 
             if (history.Count == 0 || history[0].Timestamp > startDate)
             {
-                ActivitySensorReading currentReading = await GetActivityAtAsync(startDate);
-                if (currentReading != null)
+                ActivitySensorReading firstReading = await GetActivityAtAsync(startDate);
+                if (firstReading != null)
                 {
                     List<ActivitySensorReading> finalHistory = new List<ActivitySensorReading>(history);
-                    finalHistory.Insert(0, currentReading);
+                    finalHistory.Insert(0, firstReading);
                     history = finalHistory.AsReadOnly();
                 }
             }

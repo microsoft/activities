@@ -37,7 +37,8 @@ namespace ActivitiesExample
 {
     public delegate void ReadingChangedEventHandler(object sender, object args);
     /// <summary>
-    /// Platform agnostic Activity Sensor interface.
+    /// Platform agnostic Activity Sensor interface. 
+    /// This interface is implementd by OSActivitySensor and LumiaActivitySensor.
     /// </summary>
     public interface IActivitySensor
     {
@@ -60,12 +61,6 @@ namespace ActivitiesExample
         Task DeactivateAsync();
 
         /// <summary>
-        /// Validates if all the settings and permissions are in place to use the sensor.
-        /// </summary>
-        /// <returns>Asynchronous task</returns>
-        Task ValidateSettingsAsync();
-
-        /// <summary>
         /// Pull activity entries from history database and populate the internal list.
         /// </summary>
         /// <param name="DayOffset">DayOffset from current day</param>
@@ -83,22 +78,33 @@ namespace ActivitiesExample
         /// the history entries that gets displayed in the UI.
         /// </summary>
         object GetActivityDataInstance();
+
+        /// <summary>
+        /// Delegate for receving reading changed events.
+        /// </summary>
         event ReadingChangedEventHandler ReadingChanged;
     }
-    
 
     /// <summary>
-    /// Factory class for instantiating Activity Sensor. If OS Activity Sensor is not available, SensorCore Activity Sensor is used.
+    /// Factory class for instantiating Activity Sensor. If there an activity sensor surfaced
+    /// through Windows.Devices.Sensor then the factory creates an instance of OSActivitySensor
+    /// otherwise this falls back to using LumiaActivitySensor.
     /// </summary>
     public static class ActivitySensorFactory
     {
+        /// <summary>
+        /// Static method to get the default activity sensor present in the system.
+        /// </summary>
         public static async Task<IActivitySensor> GetDefaultAsync()
         {
             IActivitySensor sensor = null;
             
             try
             {
+                // Check if there is an activity sensor in the system
                 ActivitySensor activitySensor = await ActivitySensor.GetDefaultAsync();
+
+                // If there is one then create OSActivitySensor.
                 if (activitySensor != null)
                 {
                     sensor = new OSActivitySensor(activitySensor);
@@ -106,6 +112,8 @@ namespace ActivitiesExample
             }
             catch (System.UnauthorizedAccessException)
             {
+                // If there is an activity sensor but the user has disabled motion data
+                // then check if the user wants to open settngs and enable motion data.
                 MessageDialog dialog = new MessageDialog("Motion access has been disabled in system settings. Do you want to open settings now?", "Information");
                 dialog.Commands.Add(new UICommand("Yes", async cmd => await Windows.System.Launcher.LaunchUriAsync(new Uri("ms-settings:privacy-motion"))));
                 dialog.Commands.Add(new UICommand("No"));
@@ -114,8 +122,13 @@ namespace ActivitiesExample
                 return null;
             }
             
+            // If the OS activity sensor is not present then create the LumiaActivitySensor.
+            // This will use ActivityMonitor from SensorCore.
             if (sensor == null)
             {
+                // Check if all the required settings have been configured correctly
+                await LumiaActivitySensor.ValidateSettingsAsync();
+
                 sensor = new LumiaActivitySensor();
             }
             return sensor;
@@ -127,7 +140,6 @@ namespace ActivitiesExample
     /// </summary>
     public class OSActivitySensor : IActivitySensor 
     {
-
         #region Private members
         /// <summary>
         /// Singleton instance.
@@ -191,15 +203,6 @@ namespace ActivitiesExample
                 _sensor.SubscribedActivities.Add(activity);
             }
 
-            return Task.FromResult(false);
-        }
-
-        /// <summary>
-        /// Do nothing.
-        /// </summary>
-        /// <returns>Asynchronous task/returns>
-        public Task ValidateSettingsAsync()
-        {
             return Task.FromResult(false);
         }
 
@@ -475,6 +478,9 @@ namespace ActivitiesExample
         /// <returns>Asynchronous task/returns>
         public async Task InitializeSensorAsync()
         {
+            // Make sure all necessary settings are enabled
+            await ValidateSettingsAsync();
+
             if (_runningInEmulator)
             {
                 // await CallSensorCoreApiAsync( async () => { _activityMonitor = await ActivityMonitorSimulator.GetDefaultAsync(); } );
@@ -498,7 +504,7 @@ namespace ActivitiesExample
         /// Validate if settings have been configured correctly to run SensorCore.
         /// </summary>
         /// <returns>Asynchronous task/returns>
-        public async Task ValidateSettingsAsync()
+        public static async Task ValidateSettingsAsync()
         {
             if (!(await ActivityMonitor.IsSupportedAsync()))
             {
@@ -618,7 +624,7 @@ namespace ActivitiesExample
 
             await CallSensorCoreApiAsync(async () =>
             {
-                await _activityMonitor.GetCurrentReadingAsync();
+                reading = await _activityMonitor.GetCurrentReadingAsync();
             });
 
             if (reading != null)

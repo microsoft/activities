@@ -6,7 +6,7 @@
   IgnorableNamespaces="uap mp">
 
 
-  <Identity Name="NokiaDeveloper.ActivitiesLumiaSensorCoreSDKsample" Publisher="CN=4AD6DA08-6C39-4A10-98CC-3243374DA59C"  Version="1.0.0.0" />
+  <Identity Name="NokiaDeveloper.ActivitiesLumiaSensorCoreSDKsample" Publisher="CN=4AD6DA08-6C39-4A10-98CC-3243374DA59C"  Version="2.0.0.0" />
   <mp:PhoneIdentity PhoneProductId="faa8e717-e1ec-436b-b32a-68b85c0550dd" PhonePublisherId="00000000-0000-0000-0000-000000000000" />
 
   <Properties>

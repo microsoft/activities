@@ -83,6 +83,10 @@ These are present by default in the manifest file
 	
 3. Version history
 --------------------------------------------------------------------------------
+* Version 2.0:
+  * Refactoring the sample to use ActivitySensor from Windows.Devices.Sensors namespace
+    (if it's available). The sample will fallback to SensorCore if there is no 
+	ActivitySensor surfaced by the OS.
 * Version 1.1.0.17: 
   * Updated to use latest Lumia SensorCore SDK 1.1 Preview
 * Version 1.1.0.13: 

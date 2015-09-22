@@ -83,9 +83,6 @@ namespace ActivitiesExample
                         DataContext = _sensor.GetActivityDataInstance();
                     }
 
-                    // Check if all the required settings have been configured correctly
-                    await _sensor.ValidateSettingsAsync();
-
                     // Register delegate to get reading changes
                     _sensor.ReadingChanged += activity_ReadingChanged;
 
@@ -99,16 +96,6 @@ namespace ActivitiesExample
         }
 
         /// <summary>
-        /// Initializes activity monitor sensor
-        /// </summary>
-        /// <returns>Asynchronous task</returns>
-        private async Task InitializeSensorAsync()
-        {
-            // Initialize sensor core
-            await _sensor.InitializeSensorAsync();
-        }
-
-        /// <summary>
         /// Called when navigating to this page
         /// </summary>
         /// <param name="e">Event arguments</param>
@@ -116,9 +103,6 @@ namespace ActivitiesExample
         {
             if( e.NavigationMode == NavigationMode.Back )
             {
-                // Make sure all necessary settings are enabled
-                await _sensor.ValidateSettingsAsync();
-
                 // Register for reading change notifications if we have already not registered.
                 _sensor.ReadingChanged += activity_ReadingChanged;
 

@@ -1,5 +1,4 @@
-﻿using Lumia.Sense;
-/*	
+﻿/*	
 The MIT License (MIT)
 Copyright (c) 2015 Microsoft
 
@@ -21,6 +20,7 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE. 
  */
+using Lumia.Sense;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -31,24 +31,29 @@ namespace ActivitiesExample.Data
     /// <summary>
     /// Data class for design mode
     /// </summary>
-    public class ActivityDesignData : INotifyPropertyChanged
+    public class ActivityDesignData<T> : INotifyPropertyChanged
     {
         #region Private members
         /// <summary>
         /// List of activities and durations
         /// </summary>
-        private List<ActivityDuration> _listData = null;
+        private List<ActivityDuration<T>> _listData = null;
 
         /// <summary>
         /// Singleton instance
         /// </summary>
-        private static ActivityDesignData _selfData;
+        private static ActivityDesignData<T> _selfData;
         #endregion
 
         /// <summary>
         /// Occurs when a property value changes.
         /// </summary>
         public event PropertyChangedEventHandler PropertyChanged;
+
+        /// <summary>
+        /// Current activity
+        /// </summary>
+        private T _currentActivity;
 
         /// <summary>
         /// This method is called by the Set accessor of each property. 
@@ -69,29 +74,18 @@ namespace ActivitiesExample.Data
         /// </summary>
         public ActivityDesignData()
         {
-            _listData = new List<ActivityDuration>();
-            if( Windows.ApplicationModel.DesignMode.DesignModeEnabled )
-            {
-                _listData.Add( new ActivityDuration( Activity.Idle, TimeSpan.FromHours( 13 ) ) );
-                _listData.Add( new ActivityDuration( Activity.Moving, TimeSpan.FromHours( 4 ) ) );
-                _listData.Add( new ActivityDuration( Activity.Stationary, TimeSpan.FromHours( 1 ) ) );
-                _listData.Add( new ActivityDuration( Activity.Walking, TimeSpan.FromHours( 2 ) ) );
-                _listData.Add( new ActivityDuration( Activity.Running, TimeSpan.FromHours( 3 ) ) );
-                _listData.Add( new ActivityDuration( Activity.Biking, TimeSpan.FromHours( 5 ) ) );
-                _listData.Add( new ActivityDuration( Activity.MovingInVehicle, TimeSpan.FromHours( 1 ) ) );
-                _listData.Add( new ActivityDuration( Activity.Unknown, TimeSpan.FromHours( 1 ) ) );
-            }
+            _listData = new List<ActivityDuration<T>>();
         }
 
         /// <summary>
         /// Create new instance of the class
         /// </summary>
         /// <returns>Design data instance</returns>
-        static public ActivityDesignData Instance()
+        static public ActivityDesignData<T> Instance()
         {
             if( _selfData == null )
             {
-                _selfData = new ActivityDesignData();
+                _selfData = new ActivityDesignData<T>();
             }
             return _selfData;
         }
@@ -99,18 +93,23 @@ namespace ActivitiesExample.Data
         /// <summary>
         /// Get the current activity
         /// </summary>
-        public Activity CurrentActivity
+        public T CurrentActivity
         {
             get
             {
-                return Activity.Walking;
+                return _currentActivity;
+            }
+            set
+            {
+                _currentActivity = value;
+                NotifyPropertyChanged("CurrentActivity");
             }
         }
 
         /// <summary>
         /// Get the list of activities and durations 
         /// </summary>
-        public List<ActivityDuration> History
+        public List<ActivityDuration<T>> History
         {
             get
             {

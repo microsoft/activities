@@ -1,4 +1,4 @@
-﻿/*
+﻿/*	
 The MIT License (MIT)
 Copyright (c) 2015 Microsoft
 
@@ -20,7 +20,7 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE. 
  */
-using Lumia.Sense;
+ using Lumia.Sense;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -32,18 +32,18 @@ namespace ActivitiesExample.Data
     /// <summary>
     /// Data class for storing activity data for displaying in UI
     /// </summary>
-    public class ActivityData : INotifyPropertyChanged
+    public class ActivityData<T> : INotifyPropertyChanged
     {
         #region Private members
         /// <summary>
         /// List of activities and durations
         /// </summary>
-        private List<ActivityDuration> _listData = null;
+        private List<ActivityDuration<T>> _listData = null;
 
         /// <summary>
         /// Current activity
         /// </summary>
-        private Activity _currentActivity = Activity.Idle;
+        private T _currentActivity;
 
         /// <summary>
         /// Date of the data set
@@ -53,7 +53,7 @@ namespace ActivitiesExample.Data
         /// <summary>
         /// Singleton instance
         /// </summary>
-        private static ActivityData _selfData;
+        private static ActivityData<T> _selfData;
         #endregion
 
         #region Events
@@ -82,18 +82,18 @@ namespace ActivitiesExample.Data
         /// </summary>
         private ActivityData()
         {
-            _listData = new List<ActivityDuration>();
+            _listData = new List<ActivityDuration<T>>();
         }
-
+        
         /// <summary>
         /// Create new instance of the class
         /// </summary>
         /// <returns>Data instance</returns>
-        static public ActivityData Instance()
+        static public ActivityData<T> Instance()
         {
             if( _selfData == null )
             {
-                _selfData = new ActivityData();
+                _selfData = new ActivityData<T>();
             }
             return _selfData;
         }
@@ -117,7 +117,7 @@ namespace ActivitiesExample.Data
         /// <summary>
         /// Current activity
         /// </summary>
-        public Activity CurrentActivity 
+        public T CurrentActivity 
         {
             get
             {
@@ -133,7 +133,7 @@ namespace ActivitiesExample.Data
         /// <summary>
         /// Summary of activities for a day
         /// </summary>
-        public List<ActivityDuration> History
+        public List<ActivityDuration<T>> History
         {
             get
             {
@@ -150,14 +150,14 @@ namespace ActivitiesExample.Data
     /// <summary>
     /// Class containing activity type and duration
     /// </summary>
-    public class ActivityDuration
+    public class ActivityDuration<T>
     {
         /// <summary>
         /// Constructor
         /// </summary>
         /// <param name="type">Activity type</param>
         /// <param name="duration">Activity duration</param>
-        public ActivityDuration( Activity type, TimeSpan duration )
+        public ActivityDuration( T type, TimeSpan duration )
         {
             // Split activity string by capital letter
             Duration = duration;
@@ -178,7 +178,7 @@ namespace ActivitiesExample.Data
         /// <summary>
         /// Activity type 
         /// </summary>
-        public Activity Type { get; set; }
+        public T Type { get; set; }
 
         /// <summary>
         /// Activity duration

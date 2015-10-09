@@ -3,9 +3,12 @@ Activities
 ==========
 
 Activities is a simple application demonstrating the use of the Activity Monitor,
-one of the four APIs offered by the Lumia SensorCore SDK.
+one of the four APIs offered by the Lumia SensorCore SDK. Starting with Windows 10,
+Activity Sensor support has been added to Windows.Devices.Sensors namespace.
+This sample checks if Activity Sensor is exposed through the underlying OS APIs in 
+Windows.Devices.Sensors before trying to use the one exposed by Lumia SensorCore SDK.
 
-With the phone collecting in the background information about user's activity the
+With the phone collecting background information about user's activity the
 application is able to access the recorded activities and build a statistic of the
 types of activities the user has performed during the current day (from 00:00 to
 current time). This data will be displayed as a list of activities and their
@@ -18,13 +21,12 @@ from the Lumia SensorCore and will display the change dynamically.
 --------------------------------------------------------------------------------
 
 Learn about the Lumia SensorCore SDK from the Lumia Developer's Library. The
-example requires the Lumia SensorCore SDK's NuGet package but will retrieve it
-automatically (if missing) on first build.
+example requires the Lumia SensorCore SDK's NuGet package.
 
-To build the application you need to have Windows 8.1 and Windows Phone SDK 8.1
+To build the application you need to have Windows 10 and Windows 10 SDK
 installed.
 
-Using the Windows Phone 8.1 SDK:
+Using the Windows 10 SDK:
 
 1. Open the SLN file: File > Open Project, select the file `activities.sln`
 2. Remove the "AnyCPU" configuration (not supported by the Lumia SensorCore SDK)
@@ -46,12 +48,16 @@ http://msdn.microsoft.com/en-us/library/gg588378%28v=vs.92%29.aspx
 
 **Important files and classes:**
 
-The core of this app's implementation is in MainPage.xaml.cs where the Activity
-Monitor API is initialized (if supported) with its production implementation
-ActivityMonitor() when the app runs on a real device or with is simulated
-alternative ActivityMonitorSimulator() when running on emulator.
+The core of this app's implementation is in MainPage.xaml.cs where it opens and 
+initializes the activity sensor instance when the page is loaded.
 
-The API is called through the CallSensorCoreApiAsync () helper function, which
+The main page does not directly talk to the SensorCore API but a wrapper in 
+ActivitySensor.cs. The wrapper tries to use ActivitySensor exposed through Windows.
+Devices.Sensors before falling back to production implementation ActivityMonitor()
+when the app runs on a real device or with its simulated alternative 
+ActivityMonitorSimulator() when running on emulator.
+
+All APIs are called through the CallSensorCoreApiAsync () helper function, which
 helps handling the typical errors, like required features being disabled in the
 system settings.
 
@@ -60,23 +66,27 @@ implementation (MyDesignData) used in IDE's design mode.
 
 **Required capabilities:**
 
-The SensorSore SDK (via its NuGet package) automatically inserts in the manifest
-file the capabilities required for it to work:
+These are present by default in the manifest file
 
+    <DeviceCapability Name="activity" />
     <DeviceCapability Name="location" />
-    <m2:DeviceCapability Name="humaninterfacedevice">
-      <m2:Device Id="vidpid:0421 0716">
-        <m2:Function Type="usage:ffaa 0001" />
-        <m2:Function Type="usage:ffee 0001" />
-        <m2:Function Type="usage:ffee 0002" />
-        <m2:Function Type="usage:ffee 0003" />
-        <m2:Function Type="usage:ffee 0004" />
-      </m2:Device>
-    </m2:DeviceCapability>
+    <DeviceCapability Name="humaninterfacedevice">
+      <Device Id="vidpid:0421 0716">
+        <Function Type="usage:ffaa 0001" />
+        <Function Type="usage:ffee 0001" />
+        <Function Type="usage:ffee 0002" />
+        <Function Type="usage:ffee 0003" />
+        <Function Type="usage:ffee 0004" />
+      </Device>
+    </DeviceCapability>
 	
 	
 3. Version history
 --------------------------------------------------------------------------------
+* Version 2.0:
+  * Refactoring the sample to use ActivitySensor from Windows.Devices.Sensors namespace
+    (if it's available). The sample will fallback to SensorCore if there is no 
+	ActivitySensor surfaced by the OS.
 * Version 1.1.0.17: 
   * Updated to use latest Lumia SensorCore SDK 1.1 Preview
 * Version 1.1.0.13: 

@@ -38,9 +38,8 @@ Alternatively you can also build the example for the emulator (x86) in which cas
 the Activity Monitor will use simulated data (and no history is available with
 the default constructor used).
 
-Please see the official documentation for
-deploying and testing applications on Windows Phone devices:
-http://msdn.microsoft.com/en-us/library/gg588378%28v=vs.92%29.aspx
+Please refer to the official SDK sample documentation for Universal Windows Platform
+development. https://github.com/microsoft/windows-universal-samples/
 
 
 2. Implementation

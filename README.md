@@ -51,12 +51,12 @@ The core of this app's implementation is in MainPage.xaml.cs where it opens and
 initializes the activity sensor instance when the page is loaded.
 
 The main page does not directly talk to the SensorCore API but a wrapper in 
-ActivitySensor.cs. The wrapper tries to use ActivitySensor exposed through Windows.
+ActivitySensor.cs. The wrapper attempts to use ActivitySensor exposed through Windows.
 Devices.Sensors before falling back to production implementation ActivityMonitor()
 when the app runs on a real device or with its simulated alternative 
 ActivityMonitorSimulator() when running on emulator.
 
-All APIs are called through the CallSensorCoreApiAsync () helper function, which
+All APIs are called through the CallSensorCoreApiAsync() helper function, which
 helps handling the typical errors, like required features being disabled in the
 system settings.
 
